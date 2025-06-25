@@ -1,2 +1,2 @@
-from .agents import agents_bp
+#from .agents import agents_bp
 # בעתיד: from .properties import properties_bp ...

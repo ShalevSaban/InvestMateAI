@@ -1,7 +1,12 @@
-from app import create_app
+from fastapi import FastAPI
+from app.routes import agents
+from app.database import create_tables
 
-app = create_app()
+app = FastAPI(title="InvestMateAI")
 
-if __name__ == "__main__":
-    app.run(debug=True, host="0.0.0.0")
+app.include_router(agents.router, prefix="/agents", tags=["Agents"])
 
+
+@app.on_event("startup")
+def on_startup():
+    create_tables()
