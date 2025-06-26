@@ -12,7 +12,6 @@ class PropertyType(str, Enum):
 
 
 class PropertyCreate(BaseModel):
-    agent_id: UUID
     city: str
     address: str
     price: Decimal
@@ -39,6 +38,16 @@ class PropertyUpdate(BaseModel):
 class PropertyOut(PropertyCreate):
     id: UUID
     image_url: Optional[str] = None
+
+
+class PublicPropertyOut(BaseModel):
+    id: str
+    city: str
+    address: str
+    price: float
+    rooms: int | None = None
+    floor: int | None = None
+    image_url: str | None = None
 
     class Config:
         from_attributes = True

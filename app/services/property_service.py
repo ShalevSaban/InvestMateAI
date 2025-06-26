@@ -7,18 +7,28 @@ from app.schemas.property import PropertyCreate, PropertyUpdate
 from fastapi import HTTPException
 
 
-def create_property(data: PropertyCreate, db: Session, agent: Agent):
-    property = Property(
-        title=data.title,
-        description=data.description,
+def create_property(data: PropertyCreate, db: Session, agent: Agent) -> Property:
+    new_property = Property(
+        city=data.city,
+        address=data.address,
         price=data.price,
-        location=data.location,
         agent_id=agent.id
     )
-    db.add(property)
+
+    optional_fields = [
+        "yield_percent", "property_type", "rooms",
+        "floor", "description", "rental_estimate"
+    ]
+
+    for field in optional_fields:
+        value = getattr(data, field, None)
+        if value is not None:
+            setattr(new_property, field, value)
+
+    db.add(new_property)
     db.commit()
-    db.refresh(property)
-    return property
+    db.refresh(new_property)
+    return new_property
 
 
 def get_properties_for_agent(db: Session, agent: Agent):
