@@ -38,6 +38,7 @@ class PropertyUpdate(BaseModel):
 
 class PropertyOut(PropertyCreate):
     id: UUID
+    image_url: Optional[str] = None
 
     class Config:
         from_attributes = True

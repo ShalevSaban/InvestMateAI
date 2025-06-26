@@ -5,4 +5,13 @@ pydantic
 psycopg2-binary
 python-dotenv
 werkzeug
-pydantic[email]
+alembic
+pytest
+httpx
+email-validator
+boto3
+python-dotenv
+python-multipart
+python-jose
+passlib[bcrypt]
+

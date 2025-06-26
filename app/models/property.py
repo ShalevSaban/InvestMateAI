@@ -19,7 +19,7 @@ class Property(Base):
     floor = Column(Integer)
     description = Column(Text)
     rental_estimate = Column(Numeric)
-
+    image_url = Column(String, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
 
     def __repr__(self):

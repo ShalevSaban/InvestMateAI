@@ -27,4 +27,29 @@ restart:
 prune:
 	docker system prune -af && docker volume prune -f
 
-.PHONY: up down logs db migrate makemigration restart prune
+### Alembic commands
+
+# צור מיגרציה חדשה עם הודעה
+migrate:
+	docker-compose exec web alembic revision --autogenerate -m "$(m)"
+
+# הרץ את כל המיגרציות
+upgrade:
+	docker-compose exec web alembic upgrade head
+
+# חזור למיגרציה קודמת (שימושי כשיש באג)
+downgrade:
+	docker-compose exec web alembic downgrade -1
+
+# הדפס גרסה נוכחית במסד הנתונים
+current:
+	docker-compose exec web alembic current
+
+# הצג היסטוריית מיגרציות
+history:
+	docker-compose exec web alembic history
+
+# פתח טרמינל אינטראקטיבי בתוך Alembic
+alembic:
+	docker-compose exec web alembic
+

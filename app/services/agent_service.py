@@ -3,6 +3,7 @@ from app.models.agent import Agent
 from app.schemas.agent import AgentCreate, AgentUpdate
 from werkzeug.security import generate_password_hash
 from fastapi import HTTPException
+from app.services.auth_service import hash_password
 import uuid
 
 
@@ -10,7 +11,7 @@ def create_agent(data: AgentCreate, db: Session) -> Agent:
     if db.query(Agent).filter_by(email=data.email).first():
         raise HTTPException(status_code=400, detail="Email already registered")
 
-    hashed_password = generate_password_hash(data.password)
+    hashed_password = hash_password(data.password)
     agent = Agent(
         full_name=data.full_name,
         phone_number=data.phone_number,

@@ -17,6 +17,16 @@ class AgentUpdate(BaseModel):
     phone_number: Optional[str] = None
 
 
+class AgentLogin(BaseModel):
+    email: EmailStr
+    password: str
+
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
+
+
 class AgentOut(BaseModel):
     id: UUID
     full_name: str
