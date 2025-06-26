@@ -5,17 +5,9 @@ from app.services.agent_service import (
     create_agent, get_all_agents, get_agent,
     update_agent, delete_agent
 )
-from app.database import SessionLocal
+from app.database import get_db
 
 router = APIRouter()
-
-
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
 
 
 @router.post("/", response_model=AgentOut, status_code=201)
