@@ -1,18 +1,29 @@
-from sqlalchemy import Column, String, DateTime, ForeignKey
-from sqlalchemy.dialects.postgresql import JSONB
-from app.database import Base
-import uuid
+from sqlalchemy import Column, String, ForeignKey, DateTime, Text
+from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.orm import relationship
+from uuid import uuid4
 from datetime import datetime
+from app.database import Base
 
 
 class Conversation(Base):
-    __tablename__ = 'conversations'
+    __tablename__ = "conversations"
 
-    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
-    agent_id = Column(String(36), ForeignKey('agents.id'), nullable=False)
-    client_identifier = Column(String(100), nullable=False)
-    chat_history = Column(JSONB, nullable=False)
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    agent_id = Column(String(36), ForeignKey("agents.id"), nullable=True)
+
+    messages = relationship("Message", back_populates="conversation", cascade="all, delete")
+    agent = relationship("Agent", back_populates="conversations")
+
+
+class Message(Base):
+    __tablename__ = "messages"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
+    conversation_id = Column(UUID(as_uuid=True), ForeignKey("conversations.id"), nullable=False)
+    role = Column(String, nullable=False)  # 'user' / 'assistant'
+    content = Column(Text, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
 
-    def __repr__(self):
-        return f"<Conversation with {self.client_identifier}>"
+    conversation = relationship("Conversation", back_populates="messages")

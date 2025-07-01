@@ -1,3 +1,3 @@
 from .agent import Agent
 from .property import Property
-from .conversation import Conversation
+from .conversation import Conversation, Message
