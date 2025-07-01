@@ -36,12 +36,9 @@ Output JSON only. No explanations.
 
 If the user mentions a specific street or address, "רחוב" extract it to the `address` field.
 For example:
-"apartment in Tel Aviv, Ben Yehuda street" → address = "Ben Yehuda street
+"apartment in Tel Aviv, Ben Yehuda street" → address = "Ben Yehuda street"
 
 say that the prices in shekels - ILS - new israeli shekel
-
-
-
 """
 
         try:
@@ -61,19 +58,79 @@ say that the prices in shekels - ILS - new israeli shekel
             content = response["choices"][0]["message"]["content"]
             print("🧠 GPT Raw Output:\n", content)
 
-            # Try extracting JSON from response
             match = re.search(r"\{.*\}", content, re.DOTALL)
             if match:
                 criteria = json.loads(match.group(0))
-                criteria["_raw"] = content.strip()  # Optional: keep full GPT reply
+                criteria["_raw"] = content.strip()
                 return criteria
             else:
-                print("❌ No JSON found in GPT output")
                 return {"_raw": content.strip()}
 
         except Exception as e:
             print(f"❌ GPT Error: {e}")
             return {"_error": str(e)}
+
+    @staticmethod
+    def generate_gpt_insights(agent_id: str, text: str) -> dict:
+        prompt = f"""
+You are a business analyst specialized in real estate. Analyze the following client messages and return dashboard insights for a real estate agent.
+
+Messages:
+{text}
+
+Output must be a valid JSON with the following format:
+{{
+  "summary": "...",
+  "frequent_needs": ["...", "..."],
+  "potential_opportunities": ["...", "..."],
+  "recommended_actions": ["...", "..."]
+}}
+
+Output only the JSON. No explanations.
+"""
+
+        try:
+            response = openai.ChatCompletion.create(
+                model="gpt-4",
+                messages=[
+                    {"role": "system", "content": "You are a dashboard assistant."},
+                    {"role": "user", "content": prompt},
+                ],
+                temperature=0.4,
+                timeout=15
+            )
+
+            content = response["choices"][0]["message"]["content"]
+            print("📊 GPT Dashboard Output:\n", content)
+
+            # Remove markdown block if it exists
+            content = content.strip()
+            if content.startswith("```json"):
+                content = content.replace("```json", "").replace("```", "").strip()
+            elif content.startswith("```"):
+                content = content.replace("```", "").strip()
+
+            # Extract JSON
+            match = re.search(r"\{.*\}", content, re.DOTALL)
+            if match:
+                parsed = json.loads(match.group(0))
+                if isinstance(parsed, dict):
+                    return {
+                        "summary": str(parsed.get("summary", "")),
+                        "frequent_needs": [str(x) for x in parsed.get("frequent_needs", [])],
+                        "potential_opportunities": [str(x) for x in parsed.get("potential_opportunities", [])],
+                        "recommended_actions": [str(x) for x in parsed.get("recommended_actions", [])],
+                    }
+
+        except Exception as e:
+            print("❌ GPT error:", e)
+            return {
+                "summary": "GPT error occurred",
+                "frequent_needs": [],
+                "potential_opportunities": [],
+                "recommended_actions": [],
+                "_error": str(e)
+            }
 
 
 def build_response_message(criteria: dict, results: list, lang: str = "en") -> str:
@@ -116,7 +173,6 @@ def build_response_message(criteria: dict, results: list, lang: str = "en") -> s
             msg += f", עם עד {max_rooms} חדרים"
         elif min_rooms:
             msg += f", עם לפחות {min_rooms} חדרים"
-
         msg += "." if n > 0 else ". לא נמצאו נכסים מתאימים."
 
     else:
@@ -145,7 +201,6 @@ def build_response_message(criteria: dict, results: list, lang: str = "en") -> s
             msg += f", with up to {max_rooms} rooms"
         elif min_rooms:
             msg += f", with at least {min_rooms} rooms"
-
         msg += "." if n > 0 else ". No matching properties found."
 
     return msg
@@ -153,45 +208,3 @@ def build_response_message(criteria: dict, results: list, lang: str = "en") -> s
 
 def detect_language(text: str) -> str:
     return "he" if any("\u0590" <= c <= "\u05EA" for c in text) else "en"
-
-
-def build_gpt_prompt(messages: list) -> list:
-    """
-    Convert list of Message ORM objects into OpenAI chat format.
-    """
-    prompt = [
-        {
-            "role": "system",
-            "content": (
-                "You are a helpful real estate assistant. "
-                "Answer briefly and professionally. "
-                "Ask follow-up questions if helpful. "
-                "Use existing context from the chat if applicable."
-            )
-        }
-    ]
-
-    for msg in sorted(messages, key=lambda m: m.created_at):
-        prompt.append({
-            "role": msg.role,
-            "content": msg.content
-        })
-
-    return prompt
-
-
-def chat_with_gpt(messages: list) -> str:
-    prompt = build_gpt_prompt(messages)
-
-    try:
-        response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",
-            messages=prompt,
-            temperature=0.4
-        )
-        return response["choices"][0]["message"]["content"]
-    except Exception as e:
-        print("❌ GPT chat error:", e)
-        return "Sorry, something went wrong with the assistant."
-
-

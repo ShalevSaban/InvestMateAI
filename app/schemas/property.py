@@ -39,6 +39,9 @@ class PropertyOut(PropertyCreate):
     id: UUID
     image_url: Optional[str] = None
 
+    class Config:
+        from_attributes = True
+
 
 class PublicPropertyOut(BaseModel):
     id: str

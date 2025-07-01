@@ -1,13 +1,16 @@
-# syntax=docker/dockerfile:1
 FROM python:3.10-slim
 
 WORKDIR /app
 
 COPY requirements.txt .
+RUN apt-get update && apt-get install -y gcc libpq-dev && rm -rf /var/lib/apt/lists/*
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
 ENV PYTHONPATH=/app
 
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+COPY start.sh .
+RUN chmod +x start.sh
+
+CMD ["./start.sh"]

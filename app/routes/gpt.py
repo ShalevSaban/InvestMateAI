@@ -1,21 +1,34 @@
 from fastapi import APIRouter, Depends, Body
 from sqlalchemy.orm import Session
+from uuid import uuid4
 from app.database import get_db
+from app.models import Conversation, Message, Agent
 from app.services.gpt_service import GPTService, detect_language, build_response_message
 from app.services.property_service import search_properties_by_criteria
+from app.utils.auth_deps import get_current_agent
+from app.schemas.property import PropertyOut
 
 router = APIRouter(prefix="/gpt", tags=["GPT"])
 
 
 @router.post("/chat")
-def chat_with_gpt(question: str = Body(..., embed=True), db: Session = Depends(get_db)):
+def chat_with_gpt(
+        question: str = Body(..., embed=True),
+        db: Session = Depends(get_db),
+        current_agent: Agent = Depends(get_current_agent),
+):
     question = question.strip()
     lang = detect_language(question)
 
-    # הפקת קריטריונים
-    criteria = GPTService.extract_search_criteria(question)
+    conversation = Conversation(agent_id=current_agent.id)
+    db.add(conversation)
+    db.commit()
+    db.refresh(conversation)
 
-    # סינון קריטריונים רלוונטיים
+    user_msg = Message(content=question, role="user", conversation_id=conversation.id)
+    db.add(user_msg)
+
+    criteria = GPTService.extract_search_criteria(question)
     filters = {
         k: v for k, v in criteria.items()
         if k in {
@@ -25,15 +38,19 @@ def chat_with_gpt(question: str = Body(..., embed=True), db: Session = Depends(g
         }
     }
 
-    # חיפוש נכסים
     properties = search_properties_by_criteria(filters, db)
 
-    # יצירת תגובה טבעית
     reply = build_response_message(criteria, properties, lang)
 
-    # החזרת תשובה
+    assistant_msg = Message(content=reply, role="assistant", conversation_id=conversation.id)
+    db.add(assistant_msg)
+
+    db.commit()
+
     return {
+        "conversation_id": str(conversation.id),
         "message": reply,
         "filters": filters,
-        "results": properties
+        "results": [PropertyOut.model_validate(p) for p in properties]
+
     }
