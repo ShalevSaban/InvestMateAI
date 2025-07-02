@@ -7,6 +7,7 @@
 - **Real Estate Agents** can register, manage their properties, and upload images.
 - **Clients** can chat naturally with the AI to discover properties based on filters like price, location, and number of rooms.
 - Clients may choose to explore properties listed by a specific agent or from all available listings.
+- When a property is created without a specified rental estimate or yield, **GPT-4 Turbo automatically estimates these values** based on location, price, and features.
 - A **dedicated agent dashboard** provides:
   - Most frequently asked questions
   - Popular properties and peak inquiry hours
@@ -19,7 +20,7 @@
 - 🐳 **Docker & Docker Compose** – Containerized environment
 - 🔐 **JWT Authentication** – Role-based agent access and Swagger/Postman compatibility
 - ☁️ **AWS S3 Integration** – Secure image uploads for property listings
-- 🤖 **GPT-4 Turbo** – Natural language understanding, yield estimation, smart insights
+- 🤖 **GPT-4 Turbo** – Natural language understanding, automatic rent/yield estimation, smart insights
 - 📦 **Clean Modular Architecture** – Models, schemas, services, routes, utils
 - 📊 **Dashboard Insights** – Real-time GPT-based analytics for agents
 
@@ -39,7 +40,7 @@ app/
 ## 🔌 API Documentation
 
 Access the live API docs here:  
-[➡️ Swagger UI](https://investmateai.onrender.com/docs )
+[➡️ Swagger UI](investmateai.onrender.com/docs)
 
 ## 🚀 Getting Started
 
@@ -57,7 +58,7 @@ docker-compose exec web alembic upgrade head
 ## ✅ Current Features
 
 - Agent authentication and CRUD operations
-- Property creation with optional GPT-based enrichment
+- Property creation with optional GPT-based enrichment (rent and yield auto-estimation)
 - Client-side smart property search via GPT-4 Turbo
 - Secure file/image uploads to AWS S3
 - Agent dashboard with GPT-driven analytics and actionable insights
