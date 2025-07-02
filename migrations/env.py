@@ -21,7 +21,7 @@ from app.models import agent, property, conversation
 config = context.config
 
 # מוודא ש-Alembic מקבל את DATABASE_URL מהסביבה
-config.set_main_option("sqlalchemy.url", os.getenv("DATABASE_URL"))
+config.set_main_option("sqlalchemy.url", os.getenv("DATABASE_URL", "").replace("%", "%%"))
 
 # הגדרת לוגים אם יש קובץ
 if config.config_file_name is not None:

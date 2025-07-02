@@ -23,3 +23,6 @@ def login(
 @router.post("/logout")
 def logout():
     return JSONResponse(content={"detail": "Logged out (token deleted on client)"})
+
+
+
