@@ -40,7 +40,7 @@ app/
 ## 🔌 API Documentation
 
 Access the live API docs here:  
-[➡️ Swagger UI](investmateai.onrender.com/docs)
+[➡️ Swagger UI](https://investmateai.onrender.com/docs)
 
 ## 🚀 Getting Started
 
