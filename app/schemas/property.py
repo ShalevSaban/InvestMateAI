@@ -50,7 +50,6 @@ class PublicPropertyOut(BaseModel):
     price: float
     rooms: int | None = None
     floor: int | None = None
-    image_url: str | None = None
 
     class Config:
         from_attributes = True

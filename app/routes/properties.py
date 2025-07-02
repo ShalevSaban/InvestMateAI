@@ -98,15 +98,15 @@ async def upload_property_image(
 @router.get("/{property_id}/image-url")
 def get_property_image_url(
         property_id: str,
-        db: Session = Depends(get_db),
-        current_agent: Agent = Depends(get_current_agent)
+        db: Session = Depends(get_db)
 ):
-    property_obj = db.query(Property).filter_by(id=property_id, agent_id=current_agent.id).first()
+    property_obj = db.query(Property).filter_by(id=property_id).first()
     if not property_obj or not property_obj.image_url:
-        raise HTTPException(status_code=404, detail="Image not found or unauthorized")
+        raise HTTPException(status_code=404, detail="Image not found")
 
     url = generate_presigned_view_url(property_obj.image_url)
     if not url:
         raise HTTPException(status_code=500, detail="Failed to generate image URL")
 
     return {"image_url": url}
+

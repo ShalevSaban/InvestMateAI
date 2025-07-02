@@ -30,8 +30,26 @@ Extract a JSON object with the following keys:
 Output must be valid JSON only. Do not explain anything.
 If the question is in Hebrew, translate internally and extract in English.
 
-If the user says "שכירות", "מחיר שכירות", or "שכר דירה" rent,rent price, rental price – always treat it as rental_estimate_max.
-Never place rent-related amounts under price or max_price.
+If the user mentions rent-related expressions (in English or Hebrew), such as:
+- "rent", "rental price", "monthly rent", "for rent", "שכירות", "שכר דירה", "מחיר שכירות"
+→ extract the amount as `rental_estimate_max`.
+
+If the user uses words like:
+- "buy", "purchase", "for sale", "לקנייה", "מחיר", "קנייה", "מכירה"
+→ extract the amount as `price`, `min_price`, or `max_price`.
+
+If the question clearly and explicitly includes both rent and purchase prices — return both `rental_estimate_max` and `max_price`.
+
+However, if both rent-related and purchase-related words appear ambiguously (e.g. "purchase rent", "rent or buy" without clear prices), always prioritize **rent context**:
+→ Set `rental_estimate_max`, and set price fields (like `price`, `min_price`, `max_price`) to null.
+
+If the question contains the word "rent", assume the context is about renting — even if the word "buy" or "purchase" is also mentioned.
+
+The presence of "rent" should default the context to rental — unless the user explicitly separates both options and gives two distinct prices.
+
+Never duplicate values between rent and purchase fields unless both were explicitly mentioned by the user.
+
+
 Output JSON only. No explanations.
 
 If the user mentions a specific street or address, "רחוב" extract it to the `address` field.
@@ -43,7 +61,7 @@ say that the prices in shekels - ILS - new israeli shekel
 
         try:
             response = openai.ChatCompletion.create(
-                model="gpt-3.5-turbo",
+                model="gpt-4-turbo",
                 messages=[
                     {
                         "role": "system",
@@ -91,7 +109,7 @@ Output only the JSON. No explanations.
 
         try:
             response = openai.ChatCompletion.create(
-                model="gpt-4",
+                model="gpt-4-turbo",
                 messages=[
                     {"role": "system", "content": "You are a dashboard assistant."},
                     {"role": "user", "content": prompt},

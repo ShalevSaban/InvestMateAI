@@ -10,17 +10,22 @@ from app.schemas.property import PropertyOut
 
 router = APIRouter(prefix="/gpt", tags=["GPT"])
 
+from typing import Optional
+from uuid import UUID
+
 
 @router.post("/chat")
 def chat_with_gpt(
         question: str = Body(..., embed=True),
+        agent_id: Optional[UUID] = Body(None, embed=True),
         db: Session = Depends(get_db),
-        current_agent: Agent = Depends(get_current_agent),
 ):
     question = question.strip()
     lang = detect_language(question)
 
-    conversation = Conversation(agent_id=current_agent.id)
+    agent = db.query(Agent).filter(Agent.id == str(agent_id)).first() if agent_id else None
+
+    conversation = Conversation(agent_id=agent.id if agent else None)
     db.add(conversation)
     db.commit()
     db.refresh(conversation)
@@ -38,13 +43,15 @@ def chat_with_gpt(
         }
     }
 
-    properties = search_properties_by_criteria(filters, db)
+    # סנן רק נכסים של אותו סוכן אם הוא ניתן
+    if agent:
+        filters["agent_id"] = str(agent.id)
 
+    properties = search_properties_by_criteria(filters, db)
     reply = build_response_message(criteria, properties, lang)
 
     assistant_msg = Message(content=reply, role="assistant", conversation_id=conversation.id)
     db.add(assistant_msg)
-
     db.commit()
 
     return {
@@ -52,5 +59,4 @@ def chat_with_gpt(
         "message": reply,
         "filters": filters,
         "results": [PropertyOut.model_validate(p) for p in properties]
-
     }

@@ -68,6 +68,8 @@ def delete_property(property_id: str, db: Session, agent: Agent):
 def search_properties_by_criteria(criteria: dict, db: Session = Depends(get_db)):
     query = db.query(Property)
 
+    if criteria.get("agent_id"):
+        query = query.filter(Property.agent_id == str(criteria["agent_id"]))
     if criteria.get("city"):
         query = query.filter(Property.city.ilike(f"%{criteria['city'].lower().strip()}%"))
     if criteria.get("address"):
