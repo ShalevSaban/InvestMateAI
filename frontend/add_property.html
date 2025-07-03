@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Add Property</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <style>
+    input, select, textarea {
+      width: 300px;
+      padding: 12px;
+      margin-bottom: 15px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+
+    button {
+      padding: 12px 20px;
+      font-size: 16px;
+      background-color: #3498db;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #2980b9;
+    }
+  </style>
+</head>
+<body>
+  <h2>Add New Property</h2>
+  <form id="property-form">
+    <input placeholder="🏠 Address (e.g., 12 Rothschild St)" id="address"><br>
+    <input placeholder="🌆 City (e.g., Tel Aviv)" id="city"><br>
+    <input placeholder="💰 Price (e.g., 1,200,000)" type="number" id="price"><br>
+    <input placeholder="🛏️ Rooms (e.g., 3)" type="number" id="rooms"><br>
+    <input placeholder="🏢 Floor (e.g., 2)" type="number" id="floor"><br>
+
+    <select id="property_type">
+      <option value="">🏡 Select Property Type</option>
+      <option value="apartment">Apartment</option>
+      <option value="house">House</option>
+      <option value="vacation">Vacation</option>
+    </select><br>
+
+    <textarea placeholder="📝 Description" id="description" rows="4"></textarea><br>
+    <button type="submit">Submit</button>
+  </form>
+  <div class="nav-buttons">
+  <a href="/static/dashboard_landing.html" class="btn-nav">← Back to Agent Dashboard</a>
+  <a href="/static/index.html" class="btn-nav">🏠 Back to Main Page</a>
+</div>
+
+
+  <script>
+    document.getElementById('property-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const token = localStorage.getItem('token');
+      const res = await fetch('/properties/', {
+        method: 'POST',
+        headers: {
+          'Authorization': 'Bearer ' + token,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          address: document.getElementById('address').value,
+          city: document.getElementById('city').value,
+          price: parseInt(document.getElementById('price').value),
+          rooms: parseInt(document.getElementById('rooms').value),
+          floor: parseInt(document.getElementById('floor').value),
+          property_type: document.getElementById('property_type').value,
+          description: document.getElementById('description').value
+        })
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        alert('✅ Property added successfully!');
+      } else {
+        alert('❌ Failed to add property: ' + JSON.stringify(data));
+      }
+    });
+  </script>
+</body>
+</html>

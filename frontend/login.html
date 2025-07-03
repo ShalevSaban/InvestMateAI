@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Login</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <h2>Login</h2>
+  <form id="login-form">
+    <input type="email" id="email" placeholder="Email (username)" required><br>
+    <input type="password" id="password" placeholder="Password" required><br>
+    <button type="submit">Login</button>
+  </form>
+  <ul>
+  <a href="/static/index.html" class="btn-nav">🏠 Back to Main Page</a>
+  </ul>
+
+  <script>
+    document.getElementById('login-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const formData = new URLSearchParams();
+      formData.append('username', document.getElementById('email').value);
+      formData.append('password', document.getElementById('password').value);
+
+      const res = await fetch('/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: formData
+      });
+
+      const data = await res.json();
+
+      if (res.ok && data.access_token) {
+        localStorage.setItem('token', data.access_token);
+        alert('Logged in successfully!');
+        window.location.href = '/static/dashboard_landing.html';
+      } else {
+        alert('Login failed: ' + JSON.stringify(data));
+      }
+    });
+  </script>
+</body>
+</html>

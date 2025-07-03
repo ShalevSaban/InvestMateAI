@@ -75,6 +75,10 @@ Handle all of the following cases (case-insensitive):
 
 Do not include house numbers or city names in the `address` field.
 
+Please follow these additional rules:
+
+- If the user provides a street name in Hebrew (e.g., "רחוב דיזנגוף"), translate it into English (e.g., "Dizengoff Street") and place it in the `address` field. Do not include directional or contextual phrases (e.g., "במרכז העיר", "צפון") in the address.
+  
 say that the prices in shekels - ILS - new israeli shekel
 """
 

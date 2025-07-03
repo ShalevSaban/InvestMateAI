@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Chat Insights</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <h2>🧠 GPT Recommendations</h2>
+  <p id="gpt-summary"></p>
+
+  <h3>❓ Most Asked Questions</h3>
+  <ul id="top-questions"></ul>
+
+  <h3>📈 Peak Chat Hours</h3>
+  <ul id="peak-hours"></ul>
+
+  <h3>🏘️ Popular Properties</h3>
+  <ul id="popular-properties"></ul>
+
+<div class="nav-buttons">
+  <a href="/static/dashboard_landing.html" class="btn-nav">← Back to Agent Dashboard</a>
+  <a href="/static/index.html" class="btn-nav">🏠 Back to Main Page</a>
+</div>
+
+
+  <script>
+    async function loadInsights() {
+      console.log("Loading insights...");
+      const token = localStorage.getItem('token');
+      const res = await fetch('/api/dashboard/insights', {
+        headers: { 'Authorization': 'Bearer ' + token }
+      });
+
+      const data = await res.json();
+      console.log("Response:", data);
+
+      // GPT Summary
+      document.getElementById('gpt-summary').textContent =
+        data.gpt_recommendations?.summary || 'No recommendations.';
+
+      // Top Questions
+      const qList = document.getElementById('top-questions');
+      qList.innerHTML = '';
+      data.top_questions?.forEach(item => {
+        const li = document.createElement('li');
+        li.textContent = `"${item.question}" - ${item.count} times`;
+        qList.appendChild(li);
+      });
+
+      // Peak Hours
+        const hList = document.getElementById('peak-hours');
+        hList.innerHTML = '';
+        data.peak_hours?.forEach(item => {
+            const li = document.createElement('li');
+            const hourLabel = `${String(item.hour).padStart(2, '0')}:00~`;
+            li.textContent = `${hourLabel} - ${item.count} messages`;
+            hList.appendChild(li);
+          });
+
+
+      // Popular Properties
+      const pList = document.getElementById('popular-properties');
+      pList.innerHTML = '';
+      data.popular_properties?.forEach(item => {
+        const li = document.createElement('li');
+        li.textContent = `${item.address} - mentioned ${item.mentions} times`;
+        pList.appendChild(li);
+      });
+    }
+
+    loadInsights();
+  </script>
+</body>
+</html>

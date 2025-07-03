@@ -6,13 +6,14 @@ from app.database import get_db
 from app.models import Agent
 from app.services.dashboard_insights import *
 
-router = APIRouter(prefix="/api/dashboard")
+# router = APIRouter(prefix="/api/dashboard")
+router = APIRouter()
 
 
 @router.get("/insights")
 def get_dashboard_insights(
-    current_agent: Agent = Depends(get_current_agent),
-    db: Session = Depends(get_db)
+        current_agent: Agent = Depends(get_current_agent),
+        db: Session = Depends(get_db)
 ):
     insights = {
         "top_questions": get_faqs(current_agent.id, db),
