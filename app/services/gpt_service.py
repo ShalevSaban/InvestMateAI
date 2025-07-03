@@ -52,9 +52,28 @@ Never duplicate values between rent and purchase fields unless both were explici
 
 Output JSON only. No explanations.
 
-If the user mentions a specific street or address, "רחוב" extract it to the `address` field.
-For example:
-"apartment in Tel Aviv, Ben Yehuda street" → address = "Ben Yehuda street"
+If the user mentions a specific street or address, extract the **street name only** into the `address` field.
+
+A "street" can be mentioned in various natural ways, in both English and Hebrew. Detect and extract the **street name without the word 'street' or 'רחוב'**.
+
+Handle all of the following cases (case-insensitive):
+
+#### 🏙️ English examples:
+- "Ben Yehuda street" → address = "Ben Yehuda"
+- "street Ben Yehuda" → address = "Ben Yehuda"
+- "on Ben Yehuda st." or "on st. Ben Yehuda" → address = "Ben Yehuda"
+- "in Tel Aviv, Ben Yehuda" → address = "Ben Yehuda"
+- "apartment in Herzliya on Weizmann street" → address = "Weizmann"
+- "flat at 12 Dizengoff" → address = "Dizengoff"
+- "looking for a place in Arlozorov st" → address = "Arlozorov"
+
+#### 🏠 Hebrew examples:
+- "רחוב הרצל בתל אביב" → address = "הרצל"
+- "מחפש דירה ברחוב אבן גבירול" → address = "אבן גבירול"
+- "אזור גן העיר, דיזינגוף" → address = "דיזינגוף"
+- "מחפש ברחוב יגאל אלון" → address = "יגאל אלון"
+
+Do not include house numbers or city names in the `address` field.
 
 say that the prices in shekels - ILS - new israeli shekel
 """
@@ -149,6 +168,48 @@ Output only the JSON. No explanations.
                 "recommended_actions": [],
                 "_error": str(e)
             }
+
+    def estimate_property_metrics(self, price, city, address, rooms=None, floor=None, description=None):
+        prompt = f"""
+        A real estate property is listed for {price} ILS. It is located in the city of {city}, on {address}.
+        {f"It has {rooms} rooms." if rooms else ""}
+        {f"It is on the {floor} floor." if floor else ""}
+        {f"Description: {description}" if description else ""}
+
+        Based on this information, estimate:
+        1. The expected monthly rental price (in ILS)
+        2. The expected rental yield (in percentage)
+
+        Respond only with a JSON object using the exact keys below.
+        Do not include explanations or use alternative key names.
+
+        Example format:
+        {{
+          "rental_estimate": 12345,
+          "yield_percent": 3.5
+        }}
+        """
+
+        response = openai.ChatCompletion.create(
+            model="gpt-4-turbo",
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0.3,
+        )
+
+        content = response.choices[0].message.content.strip()
+
+        # הסר עטיפת markdown אם קיימת (```json ... ```)
+        if content.startswith("```json"):
+            content = content.removeprefix("```json").removesuffix("```").strip()
+
+        print("🔍 GPT response content:\n", content)
+
+        try:
+            parsed = json.loads(content)
+            return parsed
+        except Exception as e:
+            print("❌ Failed to parse GPT content:", e)
+            return {"rental_estimate": None, "yield_percent": None}
 
 
 def build_response_message(criteria: dict, results: list, lang: str = "en") -> str:

@@ -26,7 +26,7 @@ def create_property_route(
         db: Session = Depends(get_db),
         current_agent: Agent = Depends(get_current_agent)
 ):
-    return create_property(data, db, current_agent)
+    return create_property(db, data, current_agent.id)
 
 
 @router.get("/", response_model=list[PropertyOut])

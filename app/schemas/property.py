@@ -50,6 +50,8 @@ class PublicPropertyOut(BaseModel):
     price: float
     rooms: int | None = None
     floor: int | None = None
+    rental_estimate: float | None = None
+    yield_percent: float | None = None
 
     class Config:
         from_attributes = True

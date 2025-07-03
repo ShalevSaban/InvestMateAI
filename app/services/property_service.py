@@ -1,31 +1,49 @@
 # app/services/property_service.py
+from decimal import Decimal
+from uuid import UUID
 
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 from app.models.property import Property
 from app.models.agent import Agent
 from app.schemas.property import PropertyCreate, PropertyUpdate
 from fastapi import HTTPException, Depends
 from app.database import get_db
+from app.services.gpt_service import GPTService
 
 
-def create_property(data: PropertyCreate, db: Session, agent: Agent) -> Property:
-    new_property = Property(
-        city=data.city.lower().strip(),
-        address=data.address.lower().strip(),
-        price=data.price,
-        agent_id=agent.id
-    )
+def create_property(db: Session, property_data: PropertyCreate, agent_id: UUID):
+    data = property_data.dict()
 
-    optional_fields = [
-        "yield_percent", "property_type", "rooms",
-        "floor", "description", "rental_estimate"
-    ]
+    # אם לא סופק מחיר שכירות או תשואה – נבצע הערכה
+    if not data.get("rental_estimate") or not data.get("yield_percent"):
+        gpt = GPTService()
+        estimated = gpt.estimate_property_metrics(
+            price=data["price"],
+            city=data["city"],
+            address=data["address"],
+            rooms=data.get("rooms"),
+            floor=data.get("floor"),
+            description=data.get("description"),
+        )
 
-    for field in optional_fields:
-        value = getattr(data, field, None)
-        if value is not None:
-            setattr(new_property, field, value)
+        print("💬 Estimated values from GPT:", estimated)
 
+        if data.get("rental_estimate") is None and estimated.get("rental_estimate") is not None:
+            try:
+                data["rental_estimate"] = Decimal(str(estimated["rental_estimate"]))
+            except Exception as e:
+                print("❌ rental_estimate conversion failed:", e)
+
+        if data.get("yield_percent") is None and estimated.get("yield_percent") is not None:
+            try:
+                data["yield_percent"] = Decimal(str(estimated["yield_percent"]))
+            except Exception as e:
+                print("❌ yield_percent conversion failed:", e)
+        print("📦 Final property data before save:", data)
+
+    # יצירת המודל עם השדות
+    new_property = Property(**data, agent_id=agent_id)
     db.add(new_property)
     db.commit()
     db.refresh(new_property)
@@ -73,7 +91,8 @@ def search_properties_by_criteria(criteria: dict, db: Session = Depends(get_db))
     if criteria.get("city"):
         query = query.filter(Property.city.ilike(f"%{criteria['city'].lower().strip()}%"))
     if criteria.get("address"):
-        query = query.filter(Property.address.ilike(f"%{criteria['address']}%"))
+        address = criteria["address"].strip().lower()
+        query = query.filter(func.lower(Property.address).ilike(f"%{address}%"))
     if criteria.get("min_price"):
         query = query.filter(Property.price >= criteria["min_price"])
     if criteria.get("max_price"):

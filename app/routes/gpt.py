@@ -1,11 +1,9 @@
 from fastapi import APIRouter, Depends, Body
 from sqlalchemy.orm import Session
-from uuid import uuid4
 from app.database import get_db
 from app.models import Conversation, Message, Agent
 from app.services.gpt_service import GPTService, detect_language, build_response_message
 from app.services.property_service import search_properties_by_criteria
-from app.utils.auth_deps import get_current_agent
 from app.schemas.property import PropertyOut
 
 router = APIRouter(prefix="/gpt", tags=["GPT"])

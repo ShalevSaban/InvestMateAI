@@ -29,7 +29,11 @@ def get_peak_hours(agent_id: UUID, db: Session):
             .order_by("hour")
             .all()
     )
-    return [{"hour": int(r[0]), "count": r[1]} for r in results]
+
+    def to_local_hour(utc_hour):
+        return (int(utc_hour) + 3) % 24  # UTC+3 (Israel)
+
+    return [{"hour": to_local_hour(r[0]), "count": r[1]} for r in results]
 
 
 def get_popular_properties(agent_id: UUID, db: Session):
