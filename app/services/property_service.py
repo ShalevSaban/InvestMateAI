@@ -113,3 +113,14 @@ def search_properties_by_criteria(criteria: dict, db: Session = Depends(get_db))
         query = query.filter(Property.yield_percent >= criteria["yield_percent"])
 
     return query.all()
+
+
+def delete_all_properties_for_agent(db: Session, agent_id: UUID) -> int:
+    deleted_count = (
+        db.query(Property)
+        .filter(Property.agent_id == agent_id)
+        .delete(synchronize_session=False)
+    )
+    db.commit()
+    return deleted_count
+

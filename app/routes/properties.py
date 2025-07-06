@@ -9,7 +9,8 @@ from app.services.property_service import (
     get_properties_for_agent,
     get_property_by_id_for_agent,
     update_property,
-    delete_property
+    delete_property,
+    delete_all_properties_for_agent
 )
 from app.utils.auth_deps import get_current_agent
 from app.models.agent import Agent
@@ -110,3 +111,11 @@ def get_property_image_url(
 
     return {"image_url": url}
 
+
+@router.delete("/", response_model=dict)
+def delete_all_properties_route(
+        db: Session = Depends(get_db),
+        current_agent: Agent = Depends(get_current_agent)
+):
+    deleted_count = delete_all_properties_for_agent(db, current_agent.id)
+    return {"message": f"{deleted_count} properties deleted successfully."}
