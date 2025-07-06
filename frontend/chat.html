@@ -70,12 +70,41 @@
     button:hover {
       background-color: #2980b9;
     }
+
+    .filter-column {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      margin-top: 16px;
+      margin-bottom: 20px;
+    }
+
+    .filter-column label {
+      font-weight: bold;
+      margin-bottom: 6px;
+    }
+
+    #agent-select {
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      width: 100%;
+      background-color: #e9e9f0;
+    }
   </style>
 </head>
 <body>
 
 <div class="chat-container">
   <h2>💬 Ask The AI Agent About Properties</h2>
+
+  <div class="filter-column">
+    <label for="agent-select">🔍 Filter by Agent:</label>
+    <select id="agent-select">
+      <option value="">All Agents</option>
+    </select>
+  </div>
+
   <textarea id="question" rows="3" placeholder="e.g. Show me apartments in Netanya under 2M..."></textarea>
   <button onclick="ask()">Send</button>
 
@@ -84,9 +113,28 @@
 </div>
 
 <script>
+  // Load agents into dropdown
+  async function loadAgents() {
+    try {
+      const res = await fetch('/agents/');
+      const data = await res.json();
+      const select = document.getElementById('agent-select');
+      data.forEach(agent => {
+        const option = document.createElement('option');
+        option.value = agent.id;
+        option.textContent = agent.full_name;
+        select.appendChild(option);
+      });
+    } catch (e) {
+      console.error('Failed to load agents', e);
+    }
+  }
+
+  // Ask GPT
   async function ask() {
     const token = localStorage.getItem('token');
     const question = document.getElementById('question').value;
+    const agentId = document.getElementById('agent-select').value;
 
     const res = await fetch('/gpt/chat/', {
       method: 'POST',
@@ -94,20 +142,21 @@
         'Authorization': 'Bearer ' + token,
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ question })
+      body: JSON.stringify({
+        question,
+        agent_id: agentId || null
+      })
     });
 
     const data = await res.json();
     const container = document.getElementById('chat-response');
     container.innerHTML = '';
 
-    // GPT message bubble
     const msgBubble = document.createElement('div');
     msgBubble.className = 'chat-bubble';
     msgBubble.textContent = data.message || 'No message returned.';
     container.appendChild(msgBubble);
 
-    // Properties
     if (Array.isArray(data.results)) {
       for (const p of data.results) {
         const card = document.createElement('div');
@@ -122,13 +171,14 @@
               🏷️ Type: ${p.property_type}<br>
               🔁 Yield: ${p.yield_percent ?? 'N/A'}%<br>
               🪙 Estimated Rent: ${p.rental_estimate ?? 'N/A'}₪<br>
-              📄 ${p.description ?? 'No description.'}
+              📄 ${p.description ?? 'No description.'}<br>
+              👤 Agent: ${p.agent?.full_name ?? 'N/A'}<br>
+              📞 Phone: ${p.agent?.phone_number ?? 'N/A'}<br>
             </div>
             <div class="image-wrapper" style="flex-shrink: 0;"></div>
           </div>
         `;
 
-        // try image
         try {
           const imgRes = await fetch(`/properties/${p.id}/image-url`);
           if (imgRes.ok) {
@@ -146,6 +196,9 @@
       }
     }
   }
+
+  // Init
+  loadAgents();
 </script>
 
 </body>

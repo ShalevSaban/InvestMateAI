@@ -3,6 +3,7 @@ from typing import Optional
 from uuid import UUID
 from decimal import Decimal
 from enum import Enum
+from .agent import AgentPublic
 
 
 class PropertyType(str, Enum):
@@ -38,6 +39,7 @@ class PropertyUpdate(BaseModel):
 class PropertyOut(PropertyCreate):
     id: UUID
     image_url: Optional[str] = None
+    agent: Optional[AgentPublic] = None
 
     class Config:
         from_attributes = True

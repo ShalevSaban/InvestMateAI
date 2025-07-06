@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, ConfigDict
 from typing import Optional
 from uuid import UUID
 
@@ -35,3 +35,10 @@ class AgentOut(BaseModel):
 
     class Config:
         orm_mode = True
+
+
+class AgentPublic(BaseModel):
+    full_name: str
+    phone_number: str
+
+    model_config = ConfigDict(from_attributes=True)
