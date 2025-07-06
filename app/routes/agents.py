@@ -1,7 +1,7 @@
+from uuid import UUID
+
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-
-from app.models import Message, Conversation
 from app.schemas.agent import AgentCreate, AgentOut, AgentUpdate
 from app.services.agent_service import (
     create_agent, get_all_agents, get_agent,
@@ -9,7 +9,6 @@ from app.services.agent_service import (
 )
 from app.database import get_db
 from app.services.cleanup_service import keep_last_10_conversations_per_agent
-
 router = APIRouter()
 
 
@@ -43,10 +42,3 @@ def delete_agent_route(agent_id: str, db: Session = Depends(get_db)):
 def cleanup_old_chats(db: Session = Depends(get_db)):
     return keep_last_10_conversations_per_agent(db)
 
-
-@router.delete("/purge_all_chats", summary="Delete all conversations and messages")
-def delete_all_chats(db: Session = Depends(get_db)):
-    db.query(Message).delete()
-    db.query(Conversation).delete()
-    db.commit()
-    return {"detail": "All messages and conversations deleted"}

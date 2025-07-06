@@ -1,5 +1,5 @@
 # services/cleanup_service.py
-
+from uuid import UUID
 from sqlalchemy.orm import Session
 from app.models import Agent, Conversation, Message
 
@@ -25,3 +25,7 @@ def keep_last_10_conversations_per_agent(db: Session):
 
     db.commit()
     return {"deleted_conversations": total_deleted_convs}
+
+
+
+
