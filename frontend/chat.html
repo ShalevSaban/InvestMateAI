@@ -101,7 +101,6 @@
   <div class="filter-column">
     <label for="agent-select">🔍 Filter by Agent:</label>
     <select id="agent-select">
-      <option value="">All Agents</option>
     </select>
   </div>
 
@@ -136,6 +135,11 @@
     const question = document.getElementById('question').value;
     const agentId = document.getElementById('agent-select').value;
 
+    if (!agentId) {
+        alert("Please select an agent before asking a question.");
+        return;
+     }
+
     const res = await fetch('/gpt/chat/', {
       method: 'POST',
       headers: {
@@ -144,7 +148,7 @@
       },
       body: JSON.stringify({
         question,
-        agent_id: agentId || null
+        agent_id: agentId
       })
     });
 

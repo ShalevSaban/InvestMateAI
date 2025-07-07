@@ -37,7 +37,7 @@ def chat_with_gpt(
         if k in {
             "city", "address", "min_price", "max_price", "min_rooms", "max_rooms",
             "min_floor", "max_floor", "floor", "property_type",
-            "rental_estimate_max", "yield_percent"
+            "rental_estimate_max", "yield_percent", "description_filters"
         }
     }
 

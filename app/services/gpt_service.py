@@ -26,6 +26,8 @@ Extract a JSON object with the following keys:
 - property_type (string: "apartment", "house", etc. or null)
 - rental_estimate_max (number or null) → for monthly rent filter
 - yield_percent (minimum or average yield percent)
+- description_filters (array of relevant keywords found in the user's request related to description, like: "pool", "balcony", "city center", "near metro", etc.)
+
 
 Output must be valid JSON only. Do not explain anything.
 If the question is in Hebrew, translate internally and extract in English.
@@ -80,6 +82,10 @@ Please follow these additional rules:
 - If the user provides a street name in Hebrew (e.g., "רחוב דיזנגוף"), translate it into English (e.g., "Dizengoff Street") and place it in the `address` field. Do not include directional or contextual phrases (e.g., "במרכז העיר", "צפון") in the address.
   
 say that the prices in shekels - ILS - new israeli shekel
+
+If the user mentions general preferences or amenities (e.g., "with a pool", "near the metro", "city center", "balcony", "garden", "elevator", "parking", etc.), extract them as strings into a list under the key `description_filters`.
+
+Do not translate values. Extract them in English, even if the original question was in Hebrew.
 """
 
         try:
@@ -103,6 +109,8 @@ say that the prices in shekels - ILS - new israeli shekel
             if match:
                 criteria = json.loads(match.group(0))
                 criteria["_raw"] = content.strip()
+                if "description_filters" not in criteria:
+                    criteria["description_filters"] = []
                 return criteria
             else:
                 return {"_raw": content.strip()}
@@ -229,6 +237,7 @@ def build_response_message(criteria: dict, results: list, lang: str = "en") -> s
     max_rooms = criteria.get("max_rooms")
     min_floor = criteria.get("min_floor")
     max_floor = criteria.get("max_floor")
+    description_filters = criteria.get("description_filters")
 
     if lang == "he":
         msg = f"נמצאו {n} נכסים"
@@ -250,6 +259,8 @@ def build_response_message(criteria: dict, results: list, lang: str = "en") -> s
             msg += f", בשכירות משוערת של עד ₪{rent_max:,}"
         if yield_min:
             msg += f", עם תשואה משוערת של לפחות {yield_min:.1f}%"
+        if description_filters:
+            msg += f", מסנני חיפוש: {', '.join(description_filters)}"
         if min_rooms and max_rooms and min_rooms != max_rooms:
             msg += f", עם בין {min_rooms} ל־{max_rooms} חדרים"
         elif max_rooms:
@@ -278,6 +289,8 @@ def build_response_message(criteria: dict, results: list, lang: str = "en") -> s
             msg += f", with estimated rent under ₪{rent_max:,}"
         if yield_min:
             msg += f", with estimated yield of at least {yield_min:.1f}%"
+        if description_filters:
+            msg += f", with features: {', '.join(description_filters)}"
         if min_rooms and max_rooms and min_rooms != max_rooms:
             msg += f", with {min_rooms}–{max_rooms} rooms"
         elif max_rooms:

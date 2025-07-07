@@ -1,5 +1,6 @@
 # app/services/property_service.py
 from decimal import Decimal
+from operator import or_
 from uuid import UUID
 
 from sqlalchemy import func
@@ -111,6 +112,16 @@ def search_properties_by_criteria(criteria: dict, db: Session = Depends(get_db))
         query = query.filter(Property.rental_estimate <= criteria["rental_estimate_max"])
     if criteria.get("yield_percent") is not None:
         query = query.filter(Property.yield_percent >= criteria["yield_percent"])
+    if criteria.get("description_filters"):
+        filters = [
+            Property.description.ilike(f"%{kw.lower()}%")
+            for kw in criteria["description_filters"]
+        ]
+        if filters:
+            if len(filters) == 1:
+                query = query.filter(filters[0])
+            elif len(filters) > 1:
+                query = query.filter(or_(*filters))
 
     return query.all()
 
@@ -118,9 +129,8 @@ def search_properties_by_criteria(criteria: dict, db: Session = Depends(get_db))
 def delete_all_properties_for_agent(db: Session, agent_id: UUID) -> int:
     deleted_count = (
         db.query(Property)
-        .filter(Property.agent_id == agent_id)
-        .delete(synchronize_session=False)
+            .filter(Property.agent_id == agent_id)
+            .delete(synchronize_session=False)
     )
     db.commit()
     return deleted_count
-
