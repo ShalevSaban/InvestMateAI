@@ -1,5 +1,6 @@
 # app/services/property_service.py
 from decimal import Decimal
+from functools import reduce
 from operator import or_
 from uuid import UUID
 
@@ -11,6 +12,8 @@ from app.schemas.property import PropertyCreate, PropertyUpdate
 from fastapi import HTTPException, Depends
 from app.database import get_db
 from app.services.gpt_service import GPTService
+from app.utils.description_filters import build_description_filters
+from sqlalchemy.sql.elements import BinaryExpression
 
 
 def create_property(db: Session, property_data: PropertyCreate, agent_id: UUID):
@@ -112,17 +115,16 @@ def search_properties_by_criteria(criteria: dict, db: Session = Depends(get_db))
         query = query.filter(Property.rental_estimate <= criteria["rental_estimate_max"])
     if criteria.get("yield_percent") is not None:
         query = query.filter(Property.yield_percent >= criteria["yield_percent"])
-    if criteria.get("description_filters"):
-        filters = [
-            Property.description.ilike(f"%{kw.lower()}%")
-            for kw in criteria["description_filters"]
-        ]
-        if filters:
-            if len(filters) == 1:
-                query = query.filter(filters[0])
-            elif len(filters) > 1:
-                query = query.filter(or_(*filters))
 
+    # 💡 חדש: תיאור חכם עם נרדפות
+    desc_conditions = build_description_filters(criteria["description_filters"])
+    desc_conditions = [cond for cond in desc_conditions if isinstance(cond, BinaryExpression)]
+
+    print("✅ Safe description conditions:", desc_conditions)
+
+    if desc_conditions:
+        or_expression = reduce(lambda a, b: or_(a, b), desc_conditions)
+        query = query.filter(or_expression)
     return query.all()
 
 

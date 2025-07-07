@@ -83,9 +83,29 @@ Please follow these additional rules:
   
 say that the prices in shekels - ILS - new israeli shekel
 
-If the user mentions general preferences or amenities (e.g., "with a pool", "near the metro", "city center", "balcony", "garden", "elevator", "parking", etc.), extract them as strings into a list under the key `description_filters`.
+If the user mentions general preferences or amenities (e.g., "with a pool", "near the metro", "city center", "north area", "south area", "near bus station", "balcony", "garden", "elevator", "parking", etc.), extract them as strings into a list under the key `description_filters`.
 
-Do not translate values. Extract them in English, even if the original question was in Hebrew.
+This includes location preferences and property features such as:
+
+- "pool", "בריכה"
+- "balcony", "מרפסת"
+- "garden", "חצר"
+- "elevator", "מעלית"
+- "parking", "חניה"
+- "near public transport", "near metro", "ליד תחנת רכבת", "קרוב לתחבורה ציבורית"
+- "city center", "מרכז העיר", "במרכז"
+- "north", "south", "east", "west", "צפון", "דרום", "מזרח", "מערב"
+
+Translate Hebrew expressions into normalized English keywords. Examples:
+
+- "צפון תל אביב" → "north area"
+- "דרום תל אביב" → "south area"
+- "במרכז העיר" or "Center" → "city center"
+
+If the term is ambiguous (e.g., “Center”), assume the user means “city center” unless clearly stated otherwise.
+
+Output all values in English. Do not explain or include translations in the output — only the normalized English terms in the `description_filters` list.
+
 """
 
         try:
