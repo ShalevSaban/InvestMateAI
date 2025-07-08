@@ -37,10 +37,7 @@ app/
 └── utils/               # Helpers (JWT, AWS, GPT)
 ```
 
-## 🔌 API Documentation
 
-Access the live API docs here:  
-[➡️ Swagger UI](https://investmateai.onrender.com/docs)
 
 ## 🚀 Getting Started
 
