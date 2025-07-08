@@ -14,8 +14,8 @@
   <h3>📈 Peak Chat Hours</h3>
   <ul id="peak-hours"></ul>
 
-  <h3>🏘️ Popular Properties</h3>
-  <ul id="popular-properties"></ul>
+<!--  <h3>🏘️ Popular Properties</h3>-->
+<!--  <ul id="popular-properties"></ul>-->
 
 <div class="nav-buttons">
   <a href="/static/dashboard_landing.html" class="btn-nav">← Back to Agent Dashboard</a>
@@ -59,13 +59,13 @@
 
 
       // Popular Properties
-      const pList = document.getElementById('popular-properties');
-      pList.innerHTML = '';
-      data.popular_properties?.forEach(item => {
-        const li = document.createElement('li');
-        li.textContent = `${item.address} - mentioned ${item.mentions} times`;
-        pList.appendChild(li);
-      });
+<!--      const pList = document.getElementById('popular-properties');-->
+<!--      pList.innerHTML = '';-->
+<!--      data.popular_properties?.forEach(item => {-->
+<!--        const li = document.createElement('li');-->
+<!--        li.textContent = `${item.address} - mentioned ${item.mentions} times`;-->
+<!--        pList.appendChild(li);-->
+<!--      });-->
     }
 
     loadInsights();
