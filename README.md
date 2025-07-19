@@ -2,7 +2,7 @@
 
 **InvestMateAI** is a smart real estate platform built with a modular FastAPI backend. It empowers real estate agents to manage property listings, while clients can search properties using natural language via an AI-powered chat interface. The system intelligently translates questions into database queries and returns personalized property recommendations.
 
-[![Watch the demo](https://img.youtube.com/vi/c2lja6ioreI/0.jpg)](https://www.youtube.com/watch?v=c2lja6ioreI)
+[![Watch the demo](https://img.youtube.com/vi/ID/0.jpg)](https://www.youtube.com/watch?v=c2lja6ioreI)
 
 
 ## 👥 System Overview
