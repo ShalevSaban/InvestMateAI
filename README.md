@@ -2,7 +2,8 @@
 
 **InvestMateAI** is a smart real estate platform built with a modular FastAPI backend. It empowers real estate agents to manage property listings, while clients can search properties using natural language via an AI-powered chat interface. The system intelligently translates questions into database queries and returns personalized property recommendations.
 
-<div style="height: 0; padding-bottom: calc(56.25%); position:relative; width: 100%;"><iframe allow="autoplay; gyroscope;" allowfullscreen height="100%" referrerpolicy="strict-origin" src="https://www.kapwing.com/e/6877c4b143849b5c2788eaf6" style="border:0; height:100%; left:0; overflow:hidden; position:absolute; top:0; width:100%" title="Embedded content made on Kapwing" width="100%"></iframe></div><p style="font-size: 12px; text-align: right;">Video edited on <a href="https://www.kapwing.com/video-editor">Kapwing</a></p>
+[![Watch the video](https://img.youtube.com/vi/ID/0.jpg)](https://www.youtube.com/watch?v=c2lja6ioreI)
+
 
 ## 👥 System Overview
 
