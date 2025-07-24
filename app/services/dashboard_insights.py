@@ -3,6 +3,10 @@ from sqlalchemy import func, desc
 from uuid import UUID
 from app.models import Message, Conversation, Property
 from app.services.gpt_service import GPTService
+from datetime import datetime
+from sqlalchemy.orm import Session
+from app.models.insight_log import InsightLog
+import json
 
 
 def get_faqs(agent_id: UUID, db: Session):
@@ -65,3 +69,25 @@ def get_strategy_suggestions(agent_id: UUID, db: Session):
     )
     text = "\n".join([m.content for m in messages])
     return GPTService.generate_gpt_insights(agent_id, text)
+
+
+def get_cached_gpt_insight(agent_id: str, db: Session) -> dict | None:
+    today = datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
+    log = (
+        db.query(InsightLog)
+        .filter(
+            InsightLog.agent_id == str(agent_id),
+            InsightLog.created_at >= today
+        )
+        .first()
+    )
+    if log:
+        return json.loads(log.insight_result)
+    return None
+
+
+def save_gpt_insight(agent_id: str, result: dict, db: Session):
+    json_result = json.dumps(result, ensure_ascii=False)
+    log = InsightLog(agent_id=str(agent_id), insight_result=json_result)
+    db.add(log)
+    db.commit()
