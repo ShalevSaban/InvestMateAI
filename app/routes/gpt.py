@@ -5,8 +5,7 @@ from app.models import Conversation, Message, Agent
 from app.services.gpt_service import GPTService, detect_language, build_response_message
 from app.services.property_service import search_properties_by_criteria
 from app.schemas.property import PropertyOut
-from app.services.cache_service import get_cached_answer, store_answer_in_cache
-
+from app.services.criteria_cache_service import get_cached_criteria, save_criteria_to_cache
 
 router = APIRouter(prefix="/gpt", tags=["GPT"])
 
@@ -16,17 +15,21 @@ from uuid import UUID
 
 @router.post("/chat")
 def chat_with_gpt(
-    question: str = Body(..., embed=True),
-    agent_id: Optional[UUID] = Body(None, embed=True),
-    db: Session = Depends(get_db),
+        question: str = Body(..., embed=True),
+        agent_id: Optional[UUID] = Body(None, embed=True),
+        db: Session = Depends(get_db),
 ):
     question = question.strip()
     lang = detect_language(question)
 
     agent = db.query(Agent).filter(Agent.id == str(agent_id)).first() if agent_id else None
 
-    # 🔍 חישוב criteria ו־filters (בכל מקרה)
-    criteria = GPTService.extract_search_criteria(question)
+    criteria = get_cached_criteria(question, db)
+    if not criteria:
+        print("save cache")
+        criteria = GPTService.extract_search_criteria(question)
+        save_criteria_to_cache(question, criteria, db)
+
     filters = {
         k: v for k, v in criteria.items()
         if k in {
@@ -40,19 +43,6 @@ def chat_with_gpt(
 
     properties = search_properties_by_criteria(filters, db)
 
-    # 🧠 בדיקה אם יש תשובה מה־cache
-    cached = get_cached_answer(db, question)
-    if cached:
-        print("✅ Retrieved answer from cache")
-        return {
-            "conversation_id": None,
-            "message": cached,
-            "filters": filters,
-            "results": [PropertyOut.model_validate(p) for p in properties],
-            "source": "cache"
-        }
-
-    # 🗨 יצירת שיחה חדשה
     conversation = Conversation(agent_id=agent.id if agent else None)
     db.add(conversation)
     db.commit()
@@ -61,17 +51,17 @@ def chat_with_gpt(
     user_msg = Message(content=question, role="user", conversation_id=conversation.id)
     db.add(user_msg)
 
+    # 🧠 בניית תשובה בזמן ריצה לפי תוצאות חיפוש
     reply = build_response_message(criteria, properties, lang)
 
     assistant_msg = Message(content=reply, role="assistant", conversation_id=conversation.id)
     db.add(assistant_msg)
     db.commit()
 
-    store_answer_in_cache(db, question, reply, lang)
     return {
         "conversation_id": str(conversation.id),
         "message": reply,
         "filters": filters,
         "results": [PropertyOut.model_validate(p) for p in properties],
-        "source": "gpt"
+        "source": "criteria_cache"
     }

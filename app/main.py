@@ -4,6 +4,7 @@ from app.database import create_tables
 from fastapi.security import OAuth2PasswordBearer
 from fastapi.staticfiles import StaticFiles
 from app.telegram.webhook import router as telegram_router
+from fastapi.responses import FileResponse
 
 
 app = FastAPI(title="InvestMateAI")
@@ -21,3 +22,7 @@ app.mount("/static", StaticFiles(directory="frontend"), name="static")
 @app.on_event("startup")
 def on_startup():
     create_tables()
+
+@app.get("/")
+def serve_index():
+    return FileResponse("frontend/index.html")
