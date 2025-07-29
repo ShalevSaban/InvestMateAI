@@ -9,6 +9,8 @@ from app.services.agent_service import (
 )
 from app.database import get_db
 from app.services.cleanup_service import keep_last_10_conversations_per_agent
+from app.models import Agent  # כדי לעבוד ישירות מול הטבלה
+
 router = APIRouter()
 
 
@@ -42,3 +44,35 @@ def delete_agent_route(agent_id: str, db: Session = Depends(get_db)):
 def cleanup_old_chats(db: Session = Depends(get_db)):
     return keep_last_10_conversations_per_agent(db)
 
+
+@router.get("/{agent_id}/telegram-link")
+def get_agent_telegram_link(agent_id: UUID, db: Session = Depends(get_db)):
+    agent = db.query(Agent).filter(Agent.id == str(agent_id)).first()
+    if not agent:
+        raise HTTPException(status_code=404, detail="Agent not found")
+
+    link = f"https://t.me/InvestMateAI_bot?start={agent_id}"
+    return {"agent_id": str(agent_id), "telegram_link": link}
+
+
+# ===== לינק לפי שם =====
+@router.get("/by-name/{agent_name}/telegram-link")
+def get_agents_by_name_telegram_links(agent_name: str, db: Session = Depends(get_db)):
+    """
+    מחזיר לינקים לכל הסוכנים ששמם מתאים ל-agent_name (חיפוש case-insensitive)
+    """
+    agents = db.query(Agent).filter(Agent.full_name.ilike(f"%{agent_name}%")).all()
+
+    if not agents:
+        raise HTTPException(status_code=404, detail="No agents found with that name")
+
+    results = []
+    for agent in agents:
+        link = f"https://t.me/InvestMateAI_bot?start={agent.id}"
+        results.append({
+            "agent_id": str(agent.id),
+            "full_name": agent.full_name,
+            "telegram_link": link
+        })
+
+    return {"count": len(results), "agents": results}
