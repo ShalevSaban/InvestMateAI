@@ -43,6 +43,8 @@
       <option value="house">House</option>
       <option value="vacation">Vacation</option>
     </select><br>
+    <input placeholder="💵 Estimated Rent (e.g., 4,500)" type="number" id="rental_estimate"><br>
+    <input placeholder="📈 Estimated Yield % (e.g., 3.5)" type="number" step="0.1" id="yield_percent"><br>
 
     <textarea placeholder="📝 Description" id="description" rows="4"></textarea><br>
     <button type="submit">Submit</button>
@@ -70,6 +72,8 @@
           rooms: parseInt(document.getElementById('rooms').value),
           floor: parseInt(document.getElementById('floor').value),
           property_type: document.getElementById('property_type').value,
+          rental_estimate: parseInt(document.getElementById('rental_estimate').value),
+          yield_percent: parseFloat(document.getElementById('yield_percent').value),
           description: document.getElementById('description').value
         })
       });
