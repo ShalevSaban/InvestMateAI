@@ -4,6 +4,7 @@ import json
 import re
 from dotenv import load_dotenv
 
+
 load_dotenv()
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
@@ -324,3 +325,6 @@ def build_response_message(criteria: dict, results: list, lang: str = "en") -> s
 
 def detect_language(text: str) -> str:
     return "he" if any("\u0590" <= c <= "\u05EA" for c in text) else "en"
+
+
+
