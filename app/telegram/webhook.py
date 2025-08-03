@@ -66,6 +66,7 @@ async def telegram_webhook(req: Request, db: Session = Depends(get_db)):
                 f"📞 Phone: {p.get('agent', {}).get('phone_number', 'N/A')}"
             )
 
+
             # שולח טקסט מפורט
             await client.post(
                 f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage",
