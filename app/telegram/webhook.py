@@ -3,8 +3,6 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app.telegram.handler import handle_telegram_message
 from app.telegram.chat_context import set_agent_for_chat, get_agent_for_chat
-from app.models.agent import Agent
-from app.models.property import Property
 import httpx
 import os
 
@@ -32,36 +30,48 @@ async def telegram_webhook(req: Request, db: Session = Depends(get_db)):
                 agent_id = parts[1]
                 set_agent_for_chat(chat_id, agent_id)
 
-                # שליפת שם הסוכן וערים זמינות מה-DB
-                agent = db.query(Agent).filter(Agent.id == agent_id).first()
-                agent_name = agent.full_name if agent else "Agent"
+                # הודעת ברוך הבא מקצועית דו-לשונית
+                welcome_message = """🏡 Welcome to InvestMateAI!
+Your smart real estate assistant is ready to help you find the perfect property using natural language search.
 
-                # שליפת ערים ייחודיות מהנכסים של הסוכן
-                cities = db.query(Property.city).filter(
-                    Property.agent_id == agent_id
-                ).distinct().all()
+📍 **Available Properties:**
+Our database features properties from top agents in: Tel Aviv, Herzliya, Netanya, Givatayim, and Ramat Gan.
 
-                cities_list = [city[0] for city in cities] if cities else []
-                cities_text = ", ".join(
-                    cities_list) if cities_list else "No properties available yet | אין נכסים זמינים כרגע"
+🔍 **How to Search:**
+Simply ask about any property criteria you're looking for - location, price range, rooms, amenities, or specific features.
 
-                # הודעה דו-לשונית
-                welcome_message = f"""🏡 Welcome to InvestMateAI! | ברוכים הבאים!
-Successfully connected to agent {agent_name}
-התחברתם בהצלחה לסוכן {agent_name}
+💡 **Example Query:**
+"Show me an apartment in Ramat Gan with over 2% yield near a metro station"
 
-🔍 **How to Search | איך לחפש:**
-Ask in natural language about properties - location, price, rooms, amenities
-שאלו בשפה טבעית על נכסים - מיקום, מחיר, חדרים, שירותים
+**Pro Tips:**
+• Use natural language - ask as you would speak
+• Specify amenities like "pool," "balcony," or "parking"
+• Set price ranges, room counts, or yield requirements
+• Ask about specific neighborhoods or streets
 
-📍 **Available Cities | ערים זמינות:**
-{cities_text}
+Start exploring your next investment opportunity! 🚀
 
-💡 **Example | דוגמה:**
-"Show me an apartment with 2%+ yield near metro"
-"תראה לי דירה עם תשואה מעל 2% ליד מטרו"
+---
 
-Let's find your perfect property! | בואו נמצא את הנכס המושלם! 🚀"""
+🏡 ברוכים הבאים ל-InvestMateAI!
+העוזר החכם שלכם לנדל"ן מוכן לעזור לכם למצוא את הנכס המושלם באמצעות חיפוש בשפה טבעית.
+
+📍 **נכסים זמינים:**
+מאגר הנכסים שלנו כולל נכסים מסוכנים מובילים בערים: תל אביב, הרצליה, נתניה, גבעתיים ורמת גן.
+
+🔍 **איך לחפש:**
+פשוט שאלו על כל קריטריון שאתם מחפשים - מיקום, טווח מחירים, חדרים, שירותים או מאפיינים ספציפיים.
+
+💡 **דוגמה לשאלה:**
+"תראה לי דירה ברמת גן עם תשואה מעל 2% ליד תחנת מטרו"
+
+**טיפים מקצועיים:**
+• השתמשו בשפה טבעית - שאלו כמו שאתם מדברים
+• ציינו שירותים כמו "בריכה", "מרפסת" או "חניה"
+• קבעו טווחי מחירים, מספר חדרים או דרישות תשואה
+• שאלו על שכונות או רחובות ספציפיים
+
+התחילו לחקור את ההשקעה הבאה שלכם! 🚀"""
 
                 await client.post(
                     f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage",
@@ -97,6 +107,7 @@ Let's find your perfect property! | בואו נמצא את הנכס המושלם
                 f"👤 Agent: {p.get('agent', {}).get('full_name', 'N/A')}\n"
                 f"📞 Phone: {p.get('agent', {}).get('phone_number', 'N/A')}"
             )
+
 
             # שולח טקסט מפורט
             await client.post(
