@@ -3,6 +3,8 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app.telegram.handler import handle_telegram_message
 from app.telegram.chat_context import set_agent_for_chat, get_agent_for_chat
+from app.models.agent import Agent
+from app.models.property import Property
 import httpx
 import os
 
@@ -30,12 +32,42 @@ async def telegram_webhook(req: Request, db: Session = Depends(get_db)):
                 agent_id = parts[1]
                 set_agent_for_chat(chat_id, agent_id)
 
-                # שלח הודעת ברוך הבא
+                # שליפת שם הסוכן וערים זמינות מה-DB
+                agent = db.query(Agent).filter(Agent.id == agent_id).first()
+                agent_name = agent.full_name if agent else "Agent"
+
+                # שליפת ערים ייחודיות מהנכסים של הסוכן
+                cities = db.query(Property.city).filter(
+                    Property.agent_id == agent_id
+                ).distinct().all()
+
+                cities_list = [city[0] for city in cities] if cities else []
+                cities_text = ", ".join(
+                    cities_list) if cities_list else "No properties available yet | אין נכסים זמינים כרגע"
+
+                # הודעה דו-לשונית
+                welcome_message = f"""🏡 Welcome to InvestMateAI! | ברוכים הבאים!
+Successfully connected to agent {agent_name}
+התחברתם בהצלחה לסוכן {agent_name}
+
+🔍 **How to Search | איך לחפש:**
+Ask in natural language about properties - location, price, rooms, amenities
+שאלו בשפה טבעית על נכסים - מיקום, מחיר, חדרים, שירותים
+
+📍 **Available Cities | ערים זמינות:**
+{cities_text}
+
+💡 **Example | דוגמה:**
+"Show me an apartment with 2%+ yield near metro"
+"תראה לי דירה עם תשואה מעל 2% ליד מטרו"
+
+Let's find your perfect property! | בואו נמצא את הנכס המושלם! 🚀"""
+
                 await client.post(
                     f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage",
                     json={
                         "chat_id": chat_id,
-                        "text": f"✅ התחברת לסוכן בהצלחה! אתה יכול עכשיו לשאול שאלה חופשית."
+                        "text": welcome_message
                     }
                 )
                 return {"ok": True}
@@ -65,7 +97,6 @@ async def telegram_webhook(req: Request, db: Session = Depends(get_db)):
                 f"👤 Agent: {p.get('agent', {}).get('full_name', 'N/A')}\n"
                 f"📞 Phone: {p.get('agent', {}).get('phone_number', 'N/A')}"
             )
-
 
             # שולח טקסט מפורט
             await client.post(
