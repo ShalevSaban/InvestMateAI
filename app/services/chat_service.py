@@ -12,6 +12,7 @@ from uuid import UUID
 def process_chat_question(question: str, db: Session, agent_id: Optional[UUID] = None):
     question = question.strip()
     lang = detect_language(question)
+    print("User ask question:\n", question)
 
     agent = db.query(Agent).filter(Agent.id == str(agent_id)).first() if agent_id else None
 
@@ -44,6 +45,7 @@ def process_chat_question(question: str, db: Session, agent_id: Optional[UUID] =
     db.add(user_msg)
 
     reply = build_response_message(criteria, properties, lang)
+    print("response message", reply)
 
     assistant_msg = Message(content=reply, role="assistant", conversation_id=conversation.id)
     db.add(assistant_msg)
