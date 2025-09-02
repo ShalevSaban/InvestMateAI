@@ -26,7 +26,7 @@ Extract a JSON object with the following keys:
 - max_floor (maximum floor if mentioned)
 - property_type (string: "apartment", "house", etc. or null)
 - rental_estimate_max (number or null) → for monthly rent filter
-- yield_percent (minimum or average yield percent)
+- yield_percent (number or null)
 - description_filters (array of relevant keywords found in the user's request related to description, like: "pool", "balcony", "city center", "near metro", etc.)
 
 

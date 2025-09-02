@@ -3,6 +3,8 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app.telegram.handler import handle_telegram_message
 from app.telegram.chat_context import set_agent_for_chat, get_agent_for_chat
+from app.models.agent import Agent
+from app.models.property import Property
 import httpx
 import os
 
@@ -11,9 +13,116 @@ TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
 DOMAIN = os.getenv("DOMAIN", "localhost:8000")
 
 
+async def send_agent_selection_menu(client, chat_id, db: Session):
+    """שולח רשימה של סוכנים זמינים לבחירה"""
+    agents = db.query(Agent).all()
+
+    if not agents:
+        await client.post(
+            f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage",
+            json={
+                "chat_id": chat_id,
+                "text": "❌ אין סוכנים זמינים כרגע. אנא נסה שוב מאוחר יותר."
+            }
+        )
+        return
+
+    # יצירת כפתורים inline לבחירת סוכן
+    buttons = []
+    for agent in agents:
+        property_count = db.query(Property).filter(Property.agent_id == agent.id).count()
+        buttons.append([{
+            "text": f"{agent.full_name} ({property_count} נכסים)",
+            "callback_data": f"select_agent:{agent.id}"
+        }])
+
+    # הוספת אופציה לראות את כל הנכסים
+    buttons.append([{
+        "text": "🏠 כל הנכסים (כל הסוכנים)",
+        "callback_data": "select_agent:all"
+    }])
+
+    await client.post(
+        f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage",
+        json={
+            "chat_id": chat_id,
+            "text": "🏡 ברוכים הבאים ל-InvestMateAI!\n\n"
+                    "אנא בחרו סוכן נדל\"ן מהרשימה למטה כדי לראות את הנכסים שלו:",
+            "reply_markup": {
+                "inline_keyboard": buttons
+            }
+        }
+    )
+
+
+async def send_agent_welcome_message(client, chat_id, db: Session, agent_id: str):
+    """שולח הודעת ברכה עם פרטי הסוכן והנכסים"""
+    if agent_id == "all":
+        # כל הנכסים
+        properties = db.query(Property).all()
+        agent_name = "כל הסוכנים"
+        welcome_text = f"🎉 נבחרו כל הנכסים!\n\n"
+    else:
+        # סוכן ספציפי
+        agent = db.query(Agent).filter(Agent.id == agent_id).first()
+        if not agent:
+            await client.post(
+                f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage",
+                json={
+                    "chat_id": chat_id,
+                    "text": "❌ סוכן לא נמצא. אנא התחילו מחדש עם /start"
+                }
+            )
+            return
+
+        properties = db.query(Property).filter(Property.agent_id == agent_id).all()
+        agent_name = agent.full_name
+        welcome_text = f"🎉 התחברתם לסוכן {agent_name}!\n\n"
+
+    # סטטיסטיקות על הנכסים
+    if properties:
+        cities = list(set([p.city for p in properties]))
+        avg_price = sum([float(p.price or 0) for p in properties]) / len(properties)
+
+        welcome_text += f"📊 **סטטיסטיקות:**\n"
+        welcome_text += f"🏠 {len(properties)} נכסים זמינים\n"
+        welcome_text += f"🏙️ ערים: {', '.join(cities[:3])}" + (
+            f" ועוד {len(cities) - 3}" if len(cities) > 3 else "") + "\n"
+        welcome_text += f"💰 מחיר ממוצע: ₪{avg_price:,.0f}\n\n"
+
+        welcome_text += "💬 **איך לחפש:**\n"
+        welcome_text += "• \"דירות בתל אביב עד 5 מיליון\"\n"
+        welcome_text += "• \"בית עם בריכה בהרצליה\"\n"
+        welcome_text += "• \"3 חדרים עם מרפסת\"\n"
+        welcome_text += "• \"דירה עם תשואה מעל 2 אחוז\"\n\n"
+
+        welcome_text += "🔍 פשוט כתבו מה אתם מחפשים ואני אמצא עבורכם!\n\n"
+
+        welcome_text += "Attention! This is the Hebrew welcome version, but you can also search properties in English using free language 🌍."
+
+    else:
+        welcome_text += f"😔 לא נמצאו נכסים עבור {agent_name}.\n"
+        welcome_text += "אנא בחרו סוכן אחר או נסו שוב מאוחר יותר."
+
+    await client.post(
+        f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage",
+        json={
+            "chat_id": chat_id,
+            "text": welcome_text,
+            "parse_mode": "Markdown"
+        }
+    )
+
+
 @router.post("/webhook")
 async def telegram_webhook(req: Request, db: Session = Depends(get_db)):
     data = await req.json()
+
+    # בדיקת callback query (לחיצה על כפתור)
+    callback_query = data.get("callback_query")
+    if callback_query:
+        return await handle_callback_query(callback_query, db)
+
     message = data.get("message", {})
     text = message.get("text", "").strip()
     chat_id = message.get("chat", {}).get("id")
@@ -22,70 +131,30 @@ async def telegram_webhook(req: Request, db: Session = Depends(get_db)):
         return {"ok": False, "reason": "Missing data"}
 
     async with httpx.AsyncClient() as client:
+        print(f"🔵 Received message: '{text}' from chat_id: {chat_id}")  # לוג לבדיקה
 
-        # אם זה /start <agent_id>
+        # אם זה /start
         if text.startswith("/start"):
             parts = text.split()
             if len(parts) > 1:
+                # /start עם agent_id ישירות (מלינק)
                 agent_id = parts[1]
                 set_agent_for_chat(chat_id, agent_id)
-
-                # הודעת ברוך הבא מקצועית דו-לשונית
-                welcome_message = """🏡 Welcome to InvestMateAI!
-Your smart real estate assistant is ready to help you find the perfect property using natural language search.
-
-📍 **Available Properties:**
-Our database features properties from top agents in: Tel Aviv, Herzliya, Netanya, Givatayim, and Ramat Gan.
-
-🔍 **How to Search:**
-Simply ask about any property criteria you're looking for - location, price range, rooms, amenities, or specific features.
-
-💡 **Example Query:**
-"Show me an apartment in Ramat Gan with over 2% yield near a metro station"
-
-**Pro Tips:**
-• Use natural language - ask as you would speak
-• Specify amenities like "pool," "balcony," or "parking"
-• Set price ranges, room counts, or yield requirements
-• Ask about specific neighborhoods or streets
-
-Start exploring your next investment opportunity! 🚀
-
----
-
-🏡 ברוכים הבאים ל-InvestMateAI!
-העוזר החכם שלכם לנדל"ן מוכן לעזור לכם למצוא את הנכס המושלם באמצעות חיפוש בשפה טבעית.
-
-📍 **נכסים זמינים:**
-מאגר הנכסים שלנו כולל נכסים מסוכנים מובילים בערים: תל אביב, הרצליה, נתניה, גבעתיים ורמת גן.
-
-🔍 **איך לחפש:**
-פשוט שאלו על כל קריטריון שאתם מחפשים - מיקום, טווח מחירים, חדרים, שירותים או מאפיינים ספציפיים.
-
-💡 **דוגמה לשאלה:**
-"תראה לי דירה ברמת גן עם תשואה מעל 2% ליד תחנת מטרו"
-
-**טיפים מקצועיים:**
-• השתמשו בשפה טבעית - שאלו כמו שאתם מדברים
-• ציינו שירותים כמו "בריכה", "מרפסת" או "חניה"
-• קבעו טווחי מחירים, מספר חדרים או דרישות תשואה
-• שאלו על שכונות או רחובות ספציפיים
-
-התחילו לחקור את ההשקעה הבאה שלכם! 🚀"""
-
-                await client.post(
-                    f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage",
-                    json={
-                        "chat_id": chat_id,
-                        "text": welcome_message
-                    }
-                )
+                await send_agent_welcome_message(client, chat_id, db, agent_id)
+                return {"ok": True}
+            else:
+                # /start רגיל - הצג תפריט בחירת סוכן
+                await send_agent_selection_menu(client, chat_id, db)
                 return {"ok": True}
 
-        # אחרת – חפש את agent_id מההקשר
+        # בדיקה אם יש סוכן מוגדר
         agent_id = get_agent_for_chat(chat_id)
+        if not agent_id:
+            # אין סוכן מוגדר - הצג תפריט בחירה
+            await send_agent_selection_menu(client, chat_id, db)
+            return {"ok": True}
 
-        # קבלת התוצאה המלאה (dict) מ־process_chat_question
+        # טיפול בהודעות חיפוש רגילות
         result = handle_telegram_message(text, db, agent_id)
 
         # שולח הודעה ראשית עם התקציר
@@ -108,7 +177,6 @@ Start exploring your next investment opportunity! 🚀
                 f"📞 Phone: {p.get('agent', {}).get('phone_number', 'N/A')}"
             )
 
-
             # שולח טקסט מפורט
             await client.post(
                 f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage",
@@ -128,5 +196,40 @@ Start exploring your next investment opportunity! 🚀
                         )
             except Exception as e:
                 print(f"Failed to fetch/send image for property {p['id']}: {e}")
+
+    return {"ok": True}
+
+
+async def handle_callback_query(callback_query, db: Session):
+    """טיפול בלחיצות על כפתורים"""
+    query_id = callback_query["id"]
+    chat_id = callback_query["message"]["chat"]["id"]
+    data = callback_query["data"]
+
+    async with httpx.AsyncClient() as client:
+        if data.startswith("select_agent:"):
+            agent_id = data.split(":")[1]
+
+            # שמירת הסוכן שנבחר
+            set_agent_for_chat(chat_id, agent_id)
+
+            # מחיקת התפריט הישן
+            await client.post(
+                f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/editMessageReplyMarkup",
+                json={
+                    "chat_id": chat_id,
+                    "message_id": callback_query["message"]["message_id"],
+                    "reply_markup": {"inline_keyboard": []}
+                }
+            )
+
+            # שליחת הודעת ברכה עם הדרכה
+            await send_agent_welcome_message(client, chat_id, db, agent_id)
+
+            # אישור ל-Telegram שהcallback טופל
+            await client.post(
+                f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/answerCallbackQuery",
+                json={"callback_query_id": query_id, "text": "✅ סוכן נבחר!"}
+            )
 
     return {"ok": True}
