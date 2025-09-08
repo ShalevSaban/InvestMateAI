@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -8,7 +9,9 @@ from app.services.agent_service import (
     update_agent, delete_agent
 )
 from app.database import get_db
-from app.services.cleanup_service import keep_last_10_conversations_per_agent
+from app.services.cleanup_service import keep_last_10_conversations_per_agent, delete_old_conversations_for_agent
+from app.models.conversation import Conversation, Message
+
 from app.models import Agent  # כדי לעבוד ישירות מול הטבלה
 
 router = APIRouter()
@@ -76,3 +79,32 @@ def get_agents_by_name_telegram_links(agent_name: str, db: Session = Depends(get
         })
 
     return {"count": len(results), "agents": results}
+
+
+@router.delete("/{agent_id}/conversations/cleanup", summary="Delete agent's old conversations")
+def cleanup_agent_conversations_route(
+        agent_id: str,
+        days: int = 2,
+        db: Session = Depends(get_db)
+):
+    # וידוא שהסוכן קיים
+    agent = db.query(Agent).filter(Agent.id == agent_id).first()
+    if not agent:
+        raise HTTPException(status_code=404, detail="Agent not found")
+
+    if days < 1:
+        raise HTTPException(status_code=400, detail="Days must be at least 1")
+
+    try:
+        result = delete_old_conversations_for_agent(db, agent_id, days)
+
+        return {
+            "message": f"Successfully cleaned up conversations for {agent.full_name}",
+            "agent_name": agent.full_name,
+            "agent_id": agent_id,
+            "days_kept": days,
+            **result
+        }
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Cleanup failed: {str(e)}")

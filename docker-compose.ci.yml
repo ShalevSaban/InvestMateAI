@@ -1,0 +1,24 @@
+# docker-compose.ci.yml
+# Override for CI environment
+version: '3.8'
+
+services:
+  web:
+    environment:
+      # CI-specific environment variables
+      - DATABASE_URL=postgresql://postgres:postgres@host.docker.internal:5432/test_realestate
+      - SECRET_KEY=test_secret_key_for_ci
+      - OPENAI_API_KEY=test_key
+      - AWS_S3_BUCKET_NAME=test-bucket
+      - AWS_ACCESS_KEY_ID=test
+      - AWS_SECRET_ACCESS_KEY=test
+    depends_on: []  # Remove db dependency for CI
+    networks:
+      - default
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  # Don't start db in CI (using GitHub service)
+  db:
+    profiles:
+      - disabled

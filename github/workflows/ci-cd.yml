@@ -1,0 +1,175 @@
+# .github/workflows/ci-cd.yml
+name: InvestMateAI CI/CD
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  # Global environment variables
+  PYTHON_VERSION: '3.10'
+  NODE_VERSION: '18'
+
+jobs:
+  # 🧪 Testing Job
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: test_realestate
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+
+    - name: 🐳 Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: 🧪 Run tests with Docker Compose
+      env:
+        DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_realestate
+        SECRET_KEY: test_secret_key_for_ci
+        OPENAI_API_KEY: test_key
+      run: |
+        # Override DATABASE_URL for CI
+        export DATABASE_URL="postgresql://postgres:postgres@localhost:5432/test_realestate"
+
+        # Build and test
+        docker-compose -f docker-compose.yml -f docker-compose.ci.yml build
+        docker-compose -f docker-compose.yml -f docker-compose.ci.yml run --rm web pytest app/tests/ -v --tb=short
+
+        # Cleanup
+        docker-compose -f docker-compose.yml -f docker-compose.ci.yml down
+
+    - name: 🔍 Security scan
+      run: |
+        pip install safety bandit
+        safety check -r requirements.txt --ignore 70612
+        bandit -r app/ -f json -o bandit-report.json || true
+
+    - name: 📊 Upload test results
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: test-results
+        path: |
+          bandit-report.json
+          pytest.xml
+
+  # 🏗️ Build Job
+  build:
+    name: Build Docker Image
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.event_name == 'push'
+
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+
+    - name: 🐳 Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: 🏗️ Build and cache Docker image
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        push: false
+        tags: investmate-ai:latest
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+        outputs: type=docker,dest=/tmp/investmate-ai.tar
+
+    - name: 📤 Upload Docker image
+      uses: actions/upload-artifact@v3
+      with:
+        name: docker-image
+        path: /tmp/investmate-ai.tar
+
+  # 🚀 Deploy Job (only for main branch)
+  deploy:
+    name: Deploy to Railway
+    runs-on: ubuntu-latest
+    needs: [test, build]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    environment: production
+
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+
+    - name: 🚄 Install Railway CLI
+      run: |
+        curl -fsSL https://railway.app/install.sh | sh
+        echo "$HOME/.railway/bin" >> $GITHUB_PATH
+
+    - name: 🚀 Deploy to Railway
+      env:
+        RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+      run: |
+        railway login --token $RAILWAY_TOKEN
+        railway up --detach
+
+    - name: 🔄 Run database migrations
+      env:
+        RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+      run: |
+        railway run alembic upgrade head
+
+    - name: 🏥 Health check
+      env:
+        RAILWAY_URL: ${{ secrets.RAILWAY_URL }}
+      run: |
+        echo "⏳ Waiting for deployment to be ready..."
+        sleep 60
+
+        # Check API health
+        response=$(curl -s -o /dev/null -w "%{http_code}" $RAILWAY_URL/docs)
+        if [ $response -eq 200 ]; then
+          echo "✅ Health check passed!"
+        else
+          echo "❌ Health check failed with status: $response"
+          exit 1
+        fi
+
+    - name: 📢 Deployment notification
+      if: always()
+      run: |
+        if [ ${{ job.status }} == 'success' ]; then
+          echo "🎉 Deployment successful!"
+          echo "🌐 App URL: ${{ secrets.RAILWAY_URL }}"
+        else
+          echo "💥 Deployment failed!"
+        fi
+
+  # 🧹 Cleanup old deployments (weekly)
+  cleanup:
+    name: Cleanup
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'schedule'
+
+    steps:
+    - name: 🧹 Clean old Railway deployments
+      env:
+        RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+      run: |
+        railway login --token $RAILWAY_TOKEN
+        # Keep only last 5 deployments
+        railway deployments list --limit 10 --format json | \
+        jq -r '.[5:][].id' | \
+        xargs -I {} railway deployment delete {} --yes

@@ -47,8 +47,6 @@ def process_chat_question(question: str, db: Session, agent_id: Optional[UUID] =
     reply = build_response_message(criteria, properties, lang)
     print("response message", reply)
 
-    assistant_msg = Message(content=reply, role="assistant", conversation_id=conversation.id)
-    db.add(assistant_msg)
     db.commit()
 
     return {
