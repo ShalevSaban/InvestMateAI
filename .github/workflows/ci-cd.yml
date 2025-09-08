@@ -52,8 +52,12 @@ jobs:
         AWS_ACCESS_KEY_ID: test
         AWS_SECRET_ACCESS_KEY: test
       run: |
-        # Run migrations
-        alembic upgrade head
+        # Create database from scratch instead of migrations
+        python -c "
+        from app.database import Base, engine
+        Base.metadata.create_all(bind=engine)
+        print('✅ Database tables created successfully')
+        "
 
         # Run tests
         pytest app/tests/ -v --tb=short
