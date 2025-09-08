@@ -51,16 +51,22 @@ jobs:
         AWS_S3_BUCKET_NAME: test-bucket
         AWS_ACCESS_KEY_ID: test
         AWS_SECRET_ACCESS_KEY: test
+        PYTHONPATH: /home/runner/work/InvestMateAI/InvestMateAI
       run: |
-        # Create database from scratch instead of migrations
+        # Add current directory to Python path
+        export PYTHONPATH="${PYTHONPATH}:$(pwd)"
+
+        # Create database tables directly from models (skip migrations for CI)
         python -c "
+        import sys
+        sys.path.append('.')
         from app.database import Base, engine
         Base.metadata.create_all(bind=engine)
         print('✅ Database tables created successfully')
         "
 
-        # Run tests
-        pytest app/tests/ -v --tb=short
+        # Run tests with proper Python path
+        PYTHONPATH=. pytest app/tests/ -v --tb=short
 
     - name: 🔍 Security check
       run: |
