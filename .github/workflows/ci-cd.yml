@@ -120,7 +120,7 @@ jobs:
         RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
       run: |
         echo "🚀 Starting deployment to Railway..."
-        railway login --token $RAILWAY_TOKEN
+        railway login
         railway up --detach
         echo "✅ Deployment initiated successfully"
 
