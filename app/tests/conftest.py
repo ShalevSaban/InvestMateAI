@@ -23,7 +23,25 @@ from app.models.cached_criteria import CachedCriteria
 from app.models.insight_log import InsightLog
 
 
-# 🔧 FIX: Use StaticPool to ensure same database connection
+@pytest.fixture(autouse=True)
+def mock_all_external_apis():
+    """Mock all external APIs for all tests to avoid spending tokens"""
+    with patch('app.services.gpt_service.openai.ChatCompletion.create') as mock_openai, \
+            patch('app.services.gpt_service.GPTService.estimate_property_metrics') as mock_estimate:
+        # Mock OpenAI to return valid JSON
+        mock_openai.return_value = {
+            "choices": [{"message": {
+                "content": '{"city": "Tel Aviv", "description_filters": [], "rental_estimate": 5000, "yield_percent": 3.5}'}}]
+        }
+
+        # Mock property estimation
+        mock_estimate.return_value = {
+            "rental_estimate": 5000,
+            "yield_percent": 3.5
+        }
+
+        yield
+
 engine = create_engine(
     "sqlite:///:memory:",
     connect_args={"check_same_thread": False},
@@ -31,6 +49,8 @@ engine = create_engine(
 )
 
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+
 
 
 def override_get_db():
