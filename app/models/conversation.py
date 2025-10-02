@@ -13,7 +13,7 @@ class Conversation(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
     agent_id = Column(String(36), ForeignKey("agents.id"), nullable=True)
 
-    messages = relationship("Message", back_populates="conversation", cascade="all, delete")
+    messages = relationship("Message", back_populates="conversation", cascade="all, delete-orphan")
     agent = relationship("Agent", back_populates="conversations")
 
 
@@ -21,7 +21,7 @@ class Message(Base):
     __tablename__ = "messages"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
-    conversation_id = Column(UUID(as_uuid=True), ForeignKey("conversations.id"), nullable=False)
+    conversation_id = Column(UUID(as_uuid=True), ForeignKey("conversations.id", ondelete='CASCADE'), nullable=False)
     role = Column(String, nullable=False)  # 'user' / 'assistant'
     content = Column(Text, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)

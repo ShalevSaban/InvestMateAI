@@ -13,21 +13,6 @@ jobs:
     name: Tests & Security
     runs-on: ubuntu-latest
 
-    services:
-      postgres:
-        image: postgres:15
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: test_realestate
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 5432:5432
-
     steps:
     - name: 📥 Checkout code
       uses: actions/checkout@v4
@@ -45,7 +30,6 @@ jobs:
 
     - name: 🧪 Run tests
       env:
-        DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_realestate
         SECRET_KEY: test_secret_key_for_ci
         OPENAI_API_KEY: sk-test-key-for-ci-environment-only
         AWS_S3_BUCKET_NAME: test-bucket

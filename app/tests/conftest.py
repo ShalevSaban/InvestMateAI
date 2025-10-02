@@ -6,14 +6,11 @@ from sqlalchemy import create_engine, inspect
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
-
 # Import FastAPI app
 from app.main import app
 
-
 # Import database
 from app.database import get_db, Base
-
 
 # Import ALL models to register them
 from app.models.agent import Agent
@@ -22,6 +19,18 @@ from app.models.conversation import Conversation, Message
 from app.models.cached_criteria import CachedCriteria
 from app.models.insight_log import InsightLog
 
+
+@pytest.fixture(autouse=True)  # רץ אוטומטית לכל טסט
+def clean_database():
+    """Clean database before and after each test"""
+    # נקה לפני
+    Base.metadata.drop_all(bind=engine)
+    Base.metadata.create_all(bind=engine)
+
+    yield  # הטסט רץ כאן
+
+    # נקה אחרי
+    Base.metadata.drop_all(bind=engine)
 
 @pytest.fixture(autouse=True)
 def mock_all_external_apis():
@@ -42,6 +51,7 @@ def mock_all_external_apis():
 
         yield
 
+
 engine = create_engine(
     "sqlite:///:memory:",
     connect_args={"check_same_thread": False},
@@ -49,8 +59,6 @@ engine = create_engine(
 )
 
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-
-
 
 
 def override_get_db():
@@ -80,9 +88,9 @@ def flexible_client():
 
     app.dependency_overrides.clear()
 
+
 @pytest.fixture
 def client():
-
     # Check what's registered before creating tables
 
     # Create tables
@@ -105,7 +113,6 @@ def client():
 
 @pytest.fixture
 def auth_token(client):
-
     # Create test user
     user_data = {
         "full_name": "Test User",
@@ -127,3 +134,45 @@ def auth_token(client):
         print(f"Login error: {login_response.json()}")
 
     return login_response.json()["access_token"]
+
+
+@pytest.fixture
+def sample_property(client, auth_token):
+    headers = {"Authorization": f"Bearer {auth_token}"}
+    property_data = {
+        "city": "Test City",
+        "address": "123 Sample St",
+        "price": 1000000,
+        "rental_estimate": 3000,
+        "yield_percent": 2
+    }
+    response = client.post("/properties/", json=property_data, headers=headers)
+    return response.json()["id"]
+
+
+@pytest.fixture
+def sample_agent(client):
+    agent_data = {
+        "full_name": "Sample Agent",
+        "email": "sample@example.com",
+        "password": "password123",
+        "phone_number": "0501234567"
+    }
+    response = client.post("/agents/", json=agent_data)
+    return response.json()
+
+
+@pytest.fixture
+def clean_agent_db():
+    from app.models.agent import Agent
+    from app.database import SessionLocal
+
+    db = SessionLocal()
+    try:
+        agents = db.query(Agent).all()
+        for agent in agents:
+            db.delete(agent)
+        db.commit()
+        yield
+    finally:
+        db.close()

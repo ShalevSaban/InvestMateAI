@@ -15,8 +15,8 @@ class Agent(Base):
     password_hash = Column(String(255), nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
 
-    properties = relationship("Property", backref="agent", lazy=True, cascade="all, delete")
-    conversations = relationship("Conversation", back_populates="agent", lazy=True, cascade="all, delete")
+    properties = relationship("Property", backref="agent", lazy=True, cascade="all, delete-orphan")
+    conversations = relationship("Conversation", back_populates="agent", lazy=True, cascade="all, delete-orphan")
 
     def __repr__(self):
         return f"<Agent {self.email}>"

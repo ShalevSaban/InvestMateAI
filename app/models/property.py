@@ -8,7 +8,7 @@ class Property(Base):
     __tablename__ = 'properties'
 
     id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
-    agent_id = Column(String(36), ForeignKey('agents.id'), nullable=False)
+    agent_id = Column(String(36), ForeignKey('agents.id', ondelete='CASCADE'), nullable=False)
 
     city = Column(String(100), nullable=False)
     address = Column(String(200), nullable=False)

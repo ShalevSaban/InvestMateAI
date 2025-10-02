@@ -18,4 +18,5 @@ openai==0.28.1
 pytest
 pytest-asyncio
 factory-boy
+pytest-cov
 
