@@ -1,12 +1,13 @@
 from sqlalchemy.orm import Session
+from typing import Optional
+from uuid import UUID
 
-from app.services.criteria_cache_service import get_cached_criteria, save_criteria_to_cache
+# Updated import
+from app.services.cache_service import CacheService
 from app.services.gpt_service import GPTService, detect_language, build_response_message
 from app.services.property_service import search_properties_by_criteria
 from app.models import Conversation, Message, Agent
 from app.schemas.property import PropertyOut
-from typing import Optional
-from uuid import UUID
 
 
 def process_chat_question(question: str, db: Session, agent_id: Optional[UUID] = None):
@@ -16,11 +17,11 @@ def process_chat_question(question: str, db: Session, agent_id: Optional[UUID] =
 
     agent = db.query(Agent).filter(Agent.id == str(agent_id)).first() if agent_id else None
 
-    # cache
-    criteria = get_cached_criteria(question, db)
+    # Use CacheService
+    criteria = CacheService.get_search_criteria(question)
     if not criteria:
         criteria = GPTService.extract_search_criteria(question)
-        save_criteria_to_cache(question, criteria, db)
+        CacheService.save_search_criteria(question, criteria)
 
     filters = {
         k: v for k, v in criteria.items()
@@ -35,7 +36,7 @@ def process_chat_question(question: str, db: Session, agent_id: Optional[UUID] =
 
     properties = search_properties_by_criteria(filters, db)
 
-    # שמירת שיחה
+    # Save conversation (still PostgreSQL)
     conversation = Conversation(agent_id=agent.id if agent else None)
     db.add(conversation)
     db.commit()
@@ -54,5 +55,5 @@ def process_chat_question(question: str, db: Session, agent_id: Optional[UUID] =
         "message": reply,
         "filters": filters,
         "results": [PropertyOut.model_validate(p).model_dump() for p in properties],
-        "source": "criteria_cache"
+        "source": "redis_cache"
     }

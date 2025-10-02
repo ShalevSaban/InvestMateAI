@@ -9,11 +9,14 @@ services:
       - .:/app
     environment:
       - DATABASE_URL=postgresql://postgres:postgres@db:5432/realestate
+      - REDIS_URL=redis://redis:6379/0
     env_file:
       - .env
     depends_on:
       - db
+      - redis
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
 
   db:
     image: postgres:15
@@ -26,6 +29,14 @@ services:
       - pgdata:/var/lib/postgresql/data
     ports:
       - "5432:5432"
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --maxmemory 256mb --maxmemory-policy allkeys-lru
 
 volumes:
   pgdata:
+  redis_data:

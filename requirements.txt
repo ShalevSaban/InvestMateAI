@@ -19,4 +19,5 @@ pytest
 pytest-asyncio
 factory-boy
 pytest-cov
+redis==5.0.1
 
