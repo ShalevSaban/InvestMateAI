@@ -91,7 +91,7 @@ async def send_agent_welcome_message(client, chat_id, db: Session, agent_id: str
         welcome_text += f"💰 מחיר ממוצע: ₪{avg_price:,.0f}\n\n"
 
         welcome_text += "💬 **איך לחפש:**\n"
-        welcome_text += "• \"דירות בתל אביב עד 5 מיליון\"\n"
+        welcome_text += "• \"דירות בתל אביב עד 9 מיליון\"\n"
         welcome_text += "• \"בית עם בריכה בהרצליה\"\n"
         welcome_text += "• \"3 חדרים עם מרפסת\"\n"
         welcome_text += "• \"דירה עם תשואה מעל 2 אחוז\"\n\n"
