@@ -13,6 +13,21 @@ jobs:
     name: Tests & Security
     runs-on: ubuntu-latest
 
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: test_realestate
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
     steps:
     - name: 📥 Checkout code
       uses: actions/checkout@v4
@@ -30,7 +45,7 @@ jobs:
 
     - name: 🧪 Run tests
       env:
-        DATABASE_URL: "sqlite:///:memory:"
+        DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_realestate
         SECRET_KEY: test_secret_key_for_ci
         OPENAI_API_KEY: sk-test-key-for-ci-environment-only
         AWS_S3_BUCKET_NAME: test-bucket
@@ -38,6 +53,19 @@ jobs:
         AWS_SECRET_ACCESS_KEY: test
         PYTHONPATH: /home/runner/work/InvestMateAI/InvestMateAI
       run: |
+        # Add current directory to Python path
+        export PYTHONPATH="${PYTHONPATH}:$(pwd)"
+
+        # Create database tables directly from models (skip migrations for CI)
+        python -c "
+        import sys
+        sys.path.append('.')
+        from app.database import Base, engine
+        Base.metadata.create_all(bind=engine)
+        print('✅ Database tables created successfully')
+        "
+
+        # Run tests with proper Python path
         PYTHONPATH=. pytest app/tests/ -v --tb=short
 
     - name: 🔍 Security check
@@ -69,4 +97,3 @@ jobs:
       run: |
         docker build -t investmate-ai:latest .
         echo "✅ Docker build completed successfully"
-
