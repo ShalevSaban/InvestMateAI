@@ -15,9 +15,6 @@ from app.database import get_db, Base
 # Import ALL models to register them
 from app.models.agent import Agent
 from app.models.property import Property
-from app.models.conversation import Conversation, Message
-from app.models.cached_criteria import CachedCriteria
-from app.models.insight_log import InsightLog
 
 
 @pytest.fixture(autouse=True)  # רץ אוטומטית לכל טסט
@@ -31,6 +28,7 @@ def clean_database():
 
     # נקה אחרי
     Base.metadata.drop_all(bind=engine)
+
 
 @pytest.fixture(autouse=True)
 def mock_all_external_apis():
