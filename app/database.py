@@ -25,6 +25,6 @@ def get_db():
 def create_tables():
     from app.models.agent import Agent
     from app.models.property import Property
-    from app.models.conversation import Conversation
+
 
     Base.metadata.create_all(bind=engine)

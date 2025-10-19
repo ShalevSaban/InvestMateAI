@@ -7,7 +7,7 @@ from uuid import UUID
 from app.services.cache_service import CacheService
 from app.services.gpt_service import GPTService, detect_language, build_response_message
 from app.services.property_service import search_properties_by_criteria
-from app.models import Conversation, Message, Agent
+from app.models import Agent
 from app.schemas.property import PropertyOut
 from app.services.conversation_cache import ConversationCache
 from uuid import uuid4
@@ -39,15 +39,14 @@ def process_chat_question(question: str, db: Session, agent_id: Optional[UUID] =
 
     properties = search_properties_by_criteria(filters, db)
     reply = build_response_message(criteria, properties, lang)
-    print("response: ",reply)
+    print("response: ", reply)
 
     # Save to Redis instead of PostgreSQL
     conversation_id = str(uuid4())
 
-
     if agent:
-            ConversationCache.save_message(str(agent.id), conversation_id, "user", question)
-            #ConversationCache.save_message(str(agent.id), conversation_id, "assistant", reply)
+        ConversationCache.save_message(str(agent.id), conversation_id, "user", question)
+        # ConversationCache.save_message(str(agent.id), conversation_id, "assistant", reply)
 
     for prop in properties:
         ConversationCache.track_property_mention(str(agent.id), prop.address)

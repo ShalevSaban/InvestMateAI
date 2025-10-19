@@ -4,7 +4,6 @@ from app.services.conversation_cache import ConversationCache
 from app.services.gpt_service import GPTService
 from app.services.insight_cache import InsightCache
 from datetime import datetime
-from app.models.insight_log import InsightLog
 import json
 
 

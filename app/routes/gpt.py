@@ -1,7 +1,6 @@
 from fastapi import APIRouter, Depends, Body
 from sqlalchemy.orm import Session
 from app.database import get_db
-from app.models import CachedCriteria
 from app.services.chat_service import process_chat_question
 from app.services.cache_service import CacheService
 from app.services.conversation_cache import ConversationCache
@@ -26,20 +25,6 @@ def chat_with_gpt(
 def get_cache_stats():
     """Returns cache statistics"""
     return CacheService.get_cache_stats()
-
-
-@router.delete("/cache/clear")
-def clear_cache():
-    """Clears all cache (development only)"""
-    CacheService.clear_all_criteria()
-    return {"message": "Cache cleared successfully"}
-
-
-@router.delete("/cache/clearOldCache")
-def clear_criteria_cache(db: Session = Depends(get_db)):
-    deleted = db.query(CachedCriteria).delete()
-    db.commit()
-    return {"message": f"Deleted {deleted} cached criteria"}
 
 
 @router.get("/conversations/{agent_id}")

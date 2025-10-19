@@ -16,7 +16,6 @@ class Agent(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
 
     properties = relationship("Property", backref="agent", lazy=True, cascade="all, delete-orphan")
-    conversations = relationship("Conversation", back_populates="agent", lazy=True, cascade="all, delete-orphan")
 
     def __repr__(self):
         return f"<Agent {self.email}>"
