@@ -5,7 +5,7 @@ from fastapi.security import OAuth2PasswordBearer
 from fastapi.staticfiles import StaticFiles
 from app.telegram.webhook import router as telegram_router
 from fastapi.responses import FileResponse
-
+from app.routes import agents, properties, auth, public_properties, gpt, dashboard_insights, cleanup
 
 app = FastAPI(title="InvestMateAI")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
@@ -17,6 +17,7 @@ app.include_router(public_properties.router)
 app.include_router(gpt.router)
 app.include_router(telegram_router)
 app.mount("/static", StaticFiles(directory="frontend"), name="static")
+app.include_router(cleanup.router, prefix="/cleanup", tags=["Cleanup"])
 
 
 @app.on_event("startup")

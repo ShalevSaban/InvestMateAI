@@ -102,6 +102,10 @@ def get_property_image_url(
         db: Session = Depends(get_db)
 ):
     property_obj = db.query(Property).filter_by(id=property_id).first()
+
+    print(f"🔍 Property: {property_id}")
+    print(f"🔍 image_url: {property_obj.image_url if property_obj else 'NOT FOUND'}")
+
     if not property_obj or not property_obj.image_url:
         raise HTTPException(status_code=404, detail="Image not found")
 
