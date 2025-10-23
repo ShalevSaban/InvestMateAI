@@ -81,10 +81,10 @@ export const Chat: React.FC = () => {
             <MessageCircle size={32} className="text-white" />
           </div>
         </div>
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-slate-100 mb-2">
           Ask The AI Agent
         </h1>
-        <p className="text-gray-600 dark:text-gray-400">
+        <p className="text-gray-600 dark:text-slate-300">
           Search for properties and get instant answers
         </p>
       </div>
@@ -130,7 +130,7 @@ export const Chat: React.FC = () => {
               className={
                 message.role === 'user'
                   ? 'bg-primary-50 dark:bg-primary-900/20 ml-auto max-w-2xl'
-                  : 'bg-gray-100 dark:bg-dark-hover max-w-2xl'
+                  : 'bg-gray-100 dark:bg-slate-700 max-w-2xl'
               }
             >
               <div className="flex items-start space-x-3">
@@ -144,7 +144,7 @@ export const Chat: React.FC = () => {
                   {message.role === 'user' ? 'U' : 'AI'}
                 </div>
                 <div className="flex-1">
-                  <p className="text-gray-900 dark:text-white whitespace-pre-wrap">
+                  <p className="text-gray-900 dark:text-slate-100 whitespace-pre-wrap">
                     {message.content}
                   </p>
                 </div>
@@ -162,7 +162,7 @@ export const Chat: React.FC = () => {
         ))}
 
         {loading && (
-          <Card padding="md" className="bg-gray-100 dark:bg-dark-hover max-w-2xl">
+          <Card padding="md" className="bg-gray-100 dark:bg-slate-700 max-w-2xl">
             <div className="flex items-center space-x-3">
               <div className="w-8 h-8 rounded-full bg-gray-500 flex items-center justify-center text-white">
                 AI

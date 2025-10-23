@@ -50,10 +50,10 @@ export const Dashboard: React.FC = () => {
             <LayoutDashboard size={28} className="text-white" />
           </div>
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-slate-100">
               Agent Dashboard
             </h1>
-            <p className="text-gray-600 dark:text-gray-400">
+            <p className="text-gray-600 dark:text-slate-300">
               Welcome back! Manage your properties and view insights
             </p>
           </div>
@@ -71,10 +71,10 @@ export const Dashboard: React.FC = () => {
                     <Icon size={28} className="text-white" />
                   </div>
                   <div className="flex-1">
-                    <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+                    <h3 className="text-xl font-bold text-gray-900 dark:text-slate-100 mb-2">
                       {card.title}
                     </h3>
-                    <p className="text-gray-600 dark:text-gray-400">
+                    <p className="text-gray-600 dark:text-slate-300">
                       {card.description}
                     </p>
                   </div>

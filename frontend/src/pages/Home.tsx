@@ -15,10 +15,10 @@ export const Home: React.FC = () => {
           </div>
         </div>
 
-        <h1 className="text-5xl font-bold text-gray-900 dark:text-white mb-4">
+        <h1 className="text-5xl font-bold text-gray-900 dark:text-slate-100 mb-4">
           Welcome to InvestMateAI
         </h1>
-        <p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+        <p className="text-xl text-gray-600 dark:text-slate-300 max-w-2xl mx-auto">
           Your AI-powered real estate assistant. Connect with professional agents,
           discover properties, and make informed investment decisions.
         </p>
@@ -30,10 +30,10 @@ export const Home: React.FC = () => {
             <div className="w-16 h-16 bg-primary-100 dark:bg-primary-900/30 rounded-full flex items-center justify-center">
               <LogIn size={32} className="text-primary-500" />
             </div>
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-slate-100">
               Agent Login
             </h2>
-            <p className="text-gray-600 dark:text-gray-400">
+            <p className="text-gray-600 dark:text-slate-300">
               Access your dashboard, manage properties, and view client interactions
             </p>
             <Link to="/login" className="w-full">
@@ -49,10 +49,10 @@ export const Home: React.FC = () => {
             <div className="w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center">
               <UserPlus size={32} className="text-green-500" />
             </div>
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-slate-100">
               Register as Agent
             </h2>
-            <p className="text-gray-600 dark:text-gray-400">
+            <p className="text-gray-600 dark:text-slate-300">
               Join our network of real estate professionals and grow your business
             </p>
             <Link to="/register" className="w-full">

@@ -15,14 +15,14 @@ export const Navbar: React.FC = () => {
   };
 
   return (
-    <nav className="bg-white dark:bg-dark-card shadow-md sticky top-0 z-50 transition-colors">
+    <nav className="bg-white dark:bg-slate-800 shadow-md sticky top-0 z-50 transition-colors border-b border-gray-200 dark:border-slate-700">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <Link to="/" className="flex items-center space-x-2">
             <div className="w-10 h-10 bg-primary-500 rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-xl">IM</span>
             </div>
-            <span className="text-xl font-bold text-gray-900 dark:text-white">
+            <span className="text-xl font-bold text-gray-900 dark:text-slate-100">
               InvestMateAI
             </span>
           </Link>
@@ -30,7 +30,7 @@ export const Navbar: React.FC = () => {
           <div className="flex items-center space-x-4">
             <Link
               to="/"
-              className="text-gray-700 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-400 transition-colors flex items-center space-x-1"
+              className="text-gray-700 dark:text-slate-300 hover:text-primary-500 dark:hover:text-primary-400 transition-colors flex items-center space-x-1"
             >
               <Home size={20} />
               <span className="hidden sm:inline">Home</span>
@@ -39,7 +39,7 @@ export const Navbar: React.FC = () => {
             {isAuthenticated && (
               <Link
                 to="/dashboard"
-                className="text-gray-700 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-400 transition-colors flex items-center space-x-1"
+                className="text-gray-700 dark:text-slate-300 hover:text-primary-500 dark:hover:text-primary-400 transition-colors flex items-center space-x-1"
               >
                 <LayoutDashboard size={20} />
                 <span className="hidden sm:inline">Dashboard</span>

@@ -46,10 +46,10 @@ export const ChatInsights: React.FC = () => {
             <TrendingUp size={32} className="text-white" />
           </div>
         </div>
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-slate-100 mb-2">
           Chat Insights
         </h1>
-        <p className="text-gray-600 dark:text-gray-400">
+        <p className="text-gray-600 dark:text-slate-300">
           View client interactions and analytics
         </p>
       </div>
@@ -58,7 +58,7 @@ export const ChatInsights: React.FC = () => {
         <Card padding="lg">
           <div className="text-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500 mx-auto"></div>
-            <p className="mt-4 text-gray-600 dark:text-gray-400">Loading insights...</p>
+            <p className="mt-4 text-gray-600 dark:text-slate-300">Loading insights...</p>
           </div>
         </Card>
       ) : error ? (
@@ -71,10 +71,10 @@ export const ChatInsights: React.FC = () => {
         <Card padding="lg">
           <div className="text-center py-12">
             <MessageSquare size={48} className="mx-auto text-gray-400 mb-4" />
-            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-slate-100 mb-2">
               No insights yet
             </h3>
-            <p className="text-gray-600 dark:text-gray-400">
+            <p className="text-gray-600 dark:text-slate-300">
               Chat interactions with clients will appear here
             </p>
           </div>
@@ -103,11 +103,11 @@ export const ChatInsights: React.FC = () => {
                   <div className="flex-1">
                     <div className="flex items-center space-x-2 mb-2">
                       <MessageSquare size={18} className="text-primary-500" />
-                      <span className="font-semibold text-gray-900 dark:text-white">
+                      <span className="font-semibold text-gray-900 dark:text-slate-100">
                         Client Question
                       </span>
                     </div>
-                    <p className="text-gray-700 dark:text-gray-300 ml-6">
+                    <p className="text-gray-700 dark:text-slate-200 ml-6">
                       {insight.question}
                     </p>
                   </div>
@@ -121,17 +121,17 @@ export const ChatInsights: React.FC = () => {
                 <div className="border-l-4 border-gray-200 dark:border-gray-700 pl-6 ml-2">
                   <div className="flex items-center space-x-2 mb-2">
                     <TrendingUp size={18} className="text-green-500" />
-                    <span className="font-semibold text-gray-900 dark:text-white">
+                    <span className="font-semibold text-gray-900 dark:text-slate-100">
                       AI Response
                     </span>
                   </div>
-                  <p className="text-gray-600 dark:text-gray-400">
+                  <p className="text-gray-600 dark:text-slate-300">
                     {insight.response}
                   </p>
                 </div>
 
                 {insight.timestamp && (
-                  <div className="flex items-center space-x-2 text-sm text-gray-500 dark:text-gray-400 mt-3">
+                  <div className="flex items-center space-x-2 text-sm text-gray-500 dark:text-slate-300 mt-3">
                     <Clock size={16} />
                     <span>{new Date(insight.timestamp).toLocaleString()}</span>
                   </div>

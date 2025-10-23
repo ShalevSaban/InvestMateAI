@@ -80,10 +80,10 @@ export const UploadImage: React.FC = () => {
             <Upload size={32} className="text-white" />
           </div>
         </div>
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-slate-100 mb-2">
           Upload Property Image
         </h1>
-        <p className="text-gray-600 dark:text-gray-400">
+        <p className="text-gray-600 dark:text-slate-300">
           Add or update photos for your properties
         </p>
       </div>
@@ -116,7 +116,7 @@ export const UploadImage: React.FC = () => {
           />
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-slate-200 mb-2">
               Property Image
             </label>
             <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-8 text-center hover:border-primary-500 transition-colors">
@@ -158,11 +158,11 @@ export const UploadImage: React.FC = () => {
                       onChange={handleFileChange}
                       className="hidden"
                     />
-                    <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">
+                    <p className="text-gray-500 dark:text-slate-300 text-sm mt-1">
                       or drag and drop
                     </p>
                   </div>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                  <p className="text-xs text-gray-500 dark:text-slate-300">
                     PNG, JPG, GIF up to 10MB
                   </p>
                 </div>
