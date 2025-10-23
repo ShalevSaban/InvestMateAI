@@ -3,13 +3,39 @@
 /* Base styles */
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin: 0;
+  padding: 0;
 }
 
-/* Dark mode colors - using CSS variables for better control */
+/* Light mode (default) */
 :root {
-  --color-dark-bg: #0f172a;
-  --color-dark-card: #1e293b;
-  --color-dark-hover: #334155;
+  --bg-primary: #F8F9FB;
+  --bg-secondary: #FFFFFF;
+  --text-primary: #1E1E1E;
+  --text-secondary: #555B65;
+  --border-color: #E2E4E8;
+  --primary-blue: #007BFF;
+  --accent-purple: #6B3EFF;
+  --hover-color: #005FCC;
+}
+
+/* Dark mode */
+.dark {
+  --bg-primary: #0D0E0F;
+  --bg-secondary: #1A1B1E;
+  --text-primary: #E0E3E7;
+  --text-secondary: #A0A4AA;
+  --border-color: #2B2D31;
+  --primary-blue: #0099FF;
+  --accent-purple: #9142FF;
+  --hover-color: #4E68FF;
+}
+
+/* Apply to body */
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 /* Utility classes */
@@ -20,14 +46,7 @@ body {
   overflow: hidden;
 }
 
-/* Fix dark mode background */
-.dark {
-  background-color: var(--color-dark-bg);
-  color: #f1f5f9;
-}
-
-/* Ensure body inherits dark mode properly */
-html.dark body {
-  background-color: var(--color-dark-bg);
-  color: #f1f5f9;
+/* Shadow utility */
+.shadow-soft {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }

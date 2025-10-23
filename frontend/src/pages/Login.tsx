@@ -39,10 +39,10 @@ export const Login: React.FC = () => {
             <LogIn size={32} className="text-white" />
           </div>
         </div>
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-slate-100 mb-2">
+        <h1 className="text-3xl font-bold text-light-text dark:text-dark-text mb-2">
           Agent Login
         </h1>
-        <p className="text-gray-600 dark:text-slate-300">
+        <p className="text-light-textSecondary dark:text-dark-textSecondary">
           Access your dashboard and manage properties
         </p>
       </div>
@@ -79,7 +79,7 @@ export const Login: React.FC = () => {
         </form>
 
         <div className="mt-6 text-center">
-          <p className="text-gray-600 dark:text-slate-300">
+          <p className="text-light-textSecondary dark:text-dark-textSecondary">
             Don't have an account?{' '}
             <Link
               to="/register"

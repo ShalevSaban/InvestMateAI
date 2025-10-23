@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm create:*)",
+      "Bash(npm install:*)",
+      "Bash(npx tailwindcss:*)",
+      "Bash(npm run lint)",
+      "Bash(npm run build:*)",
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$(cat <<''EOF''\nAdd professional React + TypeScript frontend with dark mode\n\nBuilt a complete, modern frontend for InvestMateAI with:\n- React 19 + TypeScript + Vite for fast development\n- Tailwind CSS 4 with dark mode support\n- Fully responsive design (mobile, tablet, desktop)\n- Clean component architecture with reusable UI elements\n\nFeatures implemented:\n- Landing page with logo placeholder\n- Login and registration for agents\n- Agent dashboard with quick actions\n- AI-powered chat interface for property search\n- Property management (add properties, upload images)\n- Chat insights and analytics\n- Context providers for theme and authentication\n- API integration utilities with type safety\n\nAll pages are mobile-responsive and support dark mode.\n\nGenerated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
+      "Bash(find:*)",
+      "Bash(git reset:*)",
+      "Bash(git commit:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

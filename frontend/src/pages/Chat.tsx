@@ -81,10 +81,10 @@ export const Chat: React.FC = () => {
             <MessageCircle size={32} className="text-white" />
           </div>
         </div>
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-slate-100 mb-2">
+        <h1 className="text-3xl font-bold text-light-text dark:text-dark-text mb-2">
           Ask The AI Agent
         </h1>
-        <p className="text-gray-600 dark:text-slate-300">
+        <p className="text-light-textSecondary dark:text-dark-textSecondary">
           Search for properties and get instant answers
         </p>
       </div>
@@ -144,7 +144,7 @@ export const Chat: React.FC = () => {
                   {message.role === 'user' ? 'U' : 'AI'}
                 </div>
                 <div className="flex-1">
-                  <p className="text-gray-900 dark:text-slate-100 whitespace-pre-wrap">
+                  <p className="text-light-text dark:text-dark-text whitespace-pre-wrap">
                     {message.content}
                   </p>
                 </div>

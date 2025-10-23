@@ -80,10 +80,10 @@ export const UploadImage: React.FC = () => {
             <Upload size={32} className="text-white" />
           </div>
         </div>
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-slate-100 mb-2">
+        <h1 className="text-3xl font-bold text-light-text dark:text-dark-text mb-2">
           Upload Property Image
         </h1>
-        <p className="text-gray-600 dark:text-slate-300">
+        <p className="text-light-textSecondary dark:text-dark-textSecondary">
           Add or update photos for your properties
         </p>
       </div>

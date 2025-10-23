@@ -8,11 +8,11 @@ export const DarkModeToggle: React.FC = () => {
   return (
     <button
       onClick={toggleDarkMode}
-      className="p-2 rounded-lg bg-gray-200 dark:bg-slate-700 text-gray-800 dark:text-yellow-300 hover:bg-gray-300 dark:hover:bg-slate-600 transition-colors border border-gray-300 dark:border-slate-600"
+      className="p-2 rounded-lg bg-light-border dark:bg-dark-border text-light-text dark:text-yellow-400 hover:bg-light-border/70 dark:hover:bg-dark-border/70 transition-all duration-300 border border-light-border dark:border-dark-border shadow-sm"
       aria-label="Toggle dark mode"
       title={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
     >
-      {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
+      {isDarkMode ? <Sun size={20} className="animate-pulse" /> : <Moon size={20} />}
     </button>
   );
 };

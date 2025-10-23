@@ -57,10 +57,10 @@ export const Register: React.FC = () => {
             <UserPlus size={32} className="text-white" />
           </div>
         </div>
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-slate-100 mb-2">
+        <h1 className="text-3xl font-bold text-light-text dark:text-dark-text mb-2">
           Register as Agent
         </h1>
-        <p className="text-gray-600 dark:text-slate-300">
+        <p className="text-light-textSecondary dark:text-dark-textSecondary">
           Join our network of real estate professionals
         </p>
       </div>
@@ -151,7 +151,7 @@ export const Register: React.FC = () => {
         </form>
 
         <div className="mt-6 text-center">
-          <p className="text-gray-600 dark:text-slate-300">
+          <p className="text-light-textSecondary dark:text-dark-textSecondary">
             Already have an account?{' '}
             <Link
               to="/login"

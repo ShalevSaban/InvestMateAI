@@ -8,17 +8,33 @@ export default {
   theme: {
     extend: {
       colors: {
+        // Light Mode Colors
+        light: {
+          bg: '#F8F9FB',
+          card: '#FFFFFF',
+          text: '#1E1E1E',
+          textSecondary: '#555B65',
+          border: '#E2E4E8',
+        },
+        // Dark Mode Colors
+        dark: {
+          bg: '#0D0E0F',
+          card: '#1A1B1E',
+          text: '#E0E3E7',
+          textSecondary: '#A0A4AA',
+          border: '#2B2D31',
+        },
+        // Primary Blue
         primary: {
-          50: '#e6f2ff',
-          100: '#bae0ff',
-          200: '#8dceff',
-          300: '#61bcff',
-          400: '#34aaff',
-          500: '#3498db',
-          600: '#2980b9',
-          700: '#1f6897',
-          800: '#145075',
-          900: '#0a3853',
+          light: '#007BFF',
+          dark: '#0099FF',
+          hover: '#005FCC',
+          hoverDark: '#4E68FF',
+        },
+        // Accent Purple
+        accent: {
+          light: '#6B3EFF',
+          dark: '#9142FF',
         },
       }
     },
