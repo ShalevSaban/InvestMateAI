@@ -73,10 +73,10 @@ export const AddProperty: React.FC = () => {
             <Home size={32} className="text-white" />
           </div>
         </div>
-        <h1 className="text-3xl font-bold text-light-text dark:text-dark-text mb-2">
+        <h1 className="text-3xl font-bold text-app-primary mb-2">
           Add New Property
         </h1>
-        <p className="text-light-textSecondary dark:text-dark-textSecondary">
+        <p className="text-app-secondary">
           List a new property in your portfolio
         </p>
       </div>

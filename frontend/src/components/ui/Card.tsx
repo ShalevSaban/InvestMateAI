@@ -25,10 +25,10 @@ export const Card: React.FC<CardProps> = ({
   return (
     <div
       className={`
-        bg-light-card dark:bg-dark-card
+        bg-app-card
         rounded-xl
         shadow-soft
-        border border-light-border dark:border-dark-border
+        border border-app
         transition-all duration-300
         ${paddingClasses[padding]}
         ${hoverClass}

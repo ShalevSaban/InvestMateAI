@@ -10,15 +10,15 @@ export const Home: React.FC = () => {
       <div className="text-center mb-12">
         {/* Logo Placeholder */}
         <div className="flex justify-center mb-6">
-          <div className="w-32 h-32 bg-gradient-to-br from-primary-light to-accent-light dark:from-primary-dark dark:to-accent-dark rounded-3xl flex items-center justify-center shadow-soft">
+          <div className="w-32 h-32 rounded-3xl flex items-center justify-center shadow-soft bg-btn-primary">
             <span className="text-white font-bold text-5xl">IM</span>
           </div>
         </div>
 
-        <h1 className="text-5xl font-bold text-light-text dark:text-dark-text mb-4">
+        <h1 className="text-5xl font-bold text-app-primary mb-4">
           Welcome to InvestMateAI
         </h1>
-        <p className="text-xl text-light-textSecondary dark:text-dark-textSecondary max-w-2xl mx-auto">
+        <p className="text-xl text-app-secondary max-w-2xl mx-auto">
           Your AI-powered real estate assistant. Connect with professional agents,
           discover properties, and make informed investment decisions.
         </p>
@@ -27,13 +27,13 @@ export const Home: React.FC = () => {
       <div className="grid md:grid-cols-2 gap-6 mb-8">
         <Card padding="lg" hover>
           <div className="flex flex-col items-center text-center space-y-4">
-            <div className="w-16 h-16 bg-primary-light/10 dark:bg-primary-dark/20 rounded-full flex items-center justify-center border border-primary-light/30 dark:border-primary-dark/30">
-              <LogIn size={32} className="text-primary-light dark:text-primary-dark" />
+            <div className="w-16 h-16 bg-btn-primary/10 rounded-full flex items-center justify-center border border-app">
+              <LogIn size={32} className="text-btn-primary" />
             </div>
-            <h2 className="text-2xl font-bold text-light-text dark:text-dark-text">
+            <h2 className="text-2xl font-bold text-app-primary">
               Agent Login
             </h2>
-            <p className="text-light-textSecondary dark:text-dark-textSecondary">
+            <p className="text-app-secondary">
               Access your dashboard, manage properties, and view client interactions
             </p>
             <Link to="/login" className="w-full">
@@ -46,13 +46,13 @@ export const Home: React.FC = () => {
 
         <Card padding="lg" hover>
           <div className="flex flex-col items-center text-center space-y-4">
-            <div className="w-16 h-16 bg-accent-light/10 dark:bg-accent-dark/20 rounded-full flex items-center justify-center border border-accent-light/30 dark:border-accent-dark/30">
-              <UserPlus size={32} className="text-accent-light dark:text-accent-dark" />
+            <div className="w-16 h-16 bg-btn-accent/10 rounded-full flex items-center justify-center border border-app">
+              <UserPlus size={32} className="text-btn-accent" />
             </div>
-            <h2 className="text-2xl font-bold text-light-text dark:text-dark-text">
+            <h2 className="text-2xl font-bold text-app-primary">
               Register as Agent
             </h2>
-            <p className="text-light-textSecondary dark:text-dark-textSecondary">
+            <p className="text-app-secondary">
               Join our network of real estate professionals and grow your business
             </p>
             <Link to="/register" className="w-full">
@@ -64,7 +64,7 @@ export const Home: React.FC = () => {
         </Card>
       </div>
 
-      <Card padding="lg" className="bg-gradient-to-r from-primary-light to-accent-light dark:from-primary-dark dark:to-accent-dark border-none">
+      <Card padding="lg" className="bg-btn-primary border-none">
         <div className="flex flex-col md:flex-row items-center justify-between text-white space-y-4 md:space-y-0">
           <div className="flex items-center space-x-4">
             <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
@@ -90,7 +90,7 @@ export const Home: React.FC = () => {
           href="https://t.me/InvestMateAI_bot"
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center space-x-2 text-primary-light dark:text-primary-dark hover:text-primary-hover dark:hover:text-primary-hoverDark transition-colors font-semibold"
+          className="inline-flex items-center space-x-2 text-btn-primary hover:opacity-80 transition-all font-semibold"
         >
           <Send size={20} />
           <span>Chat via Telegram</span>

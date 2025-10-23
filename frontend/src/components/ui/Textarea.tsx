@@ -18,7 +18,7 @@ export const Textarea: React.FC<TextareaProps> = ({
   return (
     <div className={`${widthClass}`}>
       {label && (
-        <label className="block text-sm font-medium text-light-textSecondary dark:text-dark-textSecondary mb-1">
+        <label className="block text-sm font-medium text-app-secondary mb-1">
           {label}
         </label>
       )}
@@ -26,10 +26,10 @@ export const Textarea: React.FC<TextareaProps> = ({
         className={`
           ${widthClass}
           px-4 py-2
-          border border-light-border dark:border-dark-border
+          border border-app
           rounded-lg
-          bg-light-card dark:bg-dark-card
-          text-light-text dark:text-dark-text
+          bg-app-card
+          text-app-primary
           placeholder-light-textSecondary/60 dark:placeholder-dark-textSecondary/60
           focus:outline-none focus:ring-2 focus:ring-primary-light dark:focus:ring-primary-dark focus:border-transparent
           transition-all duration-200

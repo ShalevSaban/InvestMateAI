@@ -20,7 +20,7 @@ body {
 }
 
 /* Dark mode */
-.dark {
+html.dark {
   --bg-primary: #0D0E0F;
   --bg-secondary: #1A1B1E;
   --text-primary: #E0E3E7;
@@ -29,6 +29,11 @@ body {
   --primary-blue: #0099FF;
   --accent-purple: #9142FF;
   --hover-color: #4E68FF;
+}
+
+html.dark body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
 }
 
 /* Apply to body */
@@ -50,3 +55,17 @@ body {
 .shadow-soft {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
+
+/* Custom utilities using CSS variables */
+.bg-app-primary { background-color: var(--bg-primary) !important; }
+.bg-app-card { background-color: var(--bg-secondary) !important; }
+.text-app-primary { color: var(--text-primary) !important; }
+.text-app-secondary { color: var(--text-secondary) !important; }
+.border-app { border-color: var(--border-color) !important; }
+.bg-btn-primary { background-color: var(--primary-blue) !important; }
+.bg-btn-accent { background-color: var(--accent-purple) !important; }
+.text-btn-primary { color: var(--primary-blue) !important; }
+.text-btn-accent { color: var(--accent-purple) !important; }
+
+/* Hover states */
+.hover\:bg-btn-hover:hover { background-color: var(--hover-color) !important; }
