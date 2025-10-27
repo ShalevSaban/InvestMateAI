@@ -8,6 +8,7 @@ import { PropertyCard } from '@/components/PropertyCard';
 import { api } from '@/utils/api';
 import { Agent, Property } from '@/types';
 import { useAuth } from '@/context/AuthContext';
+import houseIcon from '@/assets/house.png';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -28,14 +29,11 @@ export const Chat: React.FC = () => {
       try {
         const data = await api.getAgents();
         setAgents(data);
-        if (data.length > 0) {
-          setSelectedAgentId(data[0].id.toString());
-        }
+        if (data.length > 0) setSelectedAgentId(data[0].id.toString());
       } catch (error) {
         console.error('Failed to fetch agents', error);
       }
     };
-
     fetchAgents();
   }, []);
 
@@ -43,24 +41,18 @@ export const Chat: React.FC = () => {
     e.preventDefault();
     if (!question.trim() || !selectedAgentId) return;
 
-    const userMessage: Message = {
-      role: 'user',
-      content: question,
-    };
-
+    const userMessage: Message = { role: 'user', content: question };
     setMessages((prev) => [...prev, userMessage]);
     setLoading(true);
     setQuestion('');
 
     try {
-      const response = await api.chat(question, parseInt(selectedAgentId), token || undefined);
-
+      const response = await api.chat(question, selectedAgentId, token || undefined);
       const assistantMessage: Message = {
         role: 'assistant',
         content: response.message,
         properties: response.results,
       };
-
       setMessages((prev) => [...prev, assistantMessage]);
     } catch (error) {
       const errorMessage: Message = {
@@ -130,21 +122,29 @@ export const Chat: React.FC = () => {
               className={
                 message.role === 'user'
                   ? 'bg-primary-50 dark:bg-primary-900/20 ml-auto max-w-2xl'
-                  : 'bg-gray-100 dark:bg-slate-700 max-w-2xl'
+                  : 'bg-gray-200 dark:bg-slate-700 max-w-2xl'
               }
             >
               <div className="flex items-start space-x-3">
                 <div
-                  className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
+                  className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 overflow-hidden shadow-sm ${
                     message.role === 'user'
-                      ? 'bg-primary-500 text-white'
-                      : 'bg-gray-500 text-white'
+                      ? 'bg-primary-500 text-black dark:text-white'
+                      : 'bg-white dark:bg-black'
                   }`}
                 >
-                  {message.role === 'user' ? 'U' : 'AI'}
+                  {message.role === 'user' ? (
+                    <span className="font-semibold">U</span>
+                  ) : (
+                    <img
+                      src={houseIcon}
+                      alt="AI Icon"
+                      className="w-6 h-6 object-contain"
+                    />
+                  )}
                 </div>
                 <div className="flex-1">
-                  <p className="text-app-primary whitespace-pre-wrap">
+                  <p className="whitespace-pre-wrap text-black dark:text-white">
                     {message.content}
                   </p>
                 </div>
@@ -162,15 +162,28 @@ export const Chat: React.FC = () => {
         ))}
 
         {loading && (
-          <Card padding="md" className="bg-gray-100 dark:bg-slate-700 max-w-2xl">
+          <Card
+            padding="md"
+            className="bg-gray-200 dark:bg-slate-700 max-w-2xl"
+          >
             <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 rounded-full bg-gray-500 flex items-center justify-center text-white">
-                AI
+              <div className="w-8 h-8 rounded-full bg-white dark:bg-black flex items-center justify-center overflow-hidden shadow-sm">
+                <img
+                  src={houseIcon}
+                  alt="AI Icon"
+                  className="w-6 h-6 object-contain"
+                />
               </div>
               <div className="flex space-x-2">
                 <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce"></div>
-                <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                <div
+                  className="w-2 h-2 bg-gray-500 rounded-full animate-bounce"
+                  style={{ animationDelay: '0.1s' }}
+                ></div>
+                <div
+                  className="w-2 h-2 bg-gray-500 rounded-full animate-bounce"
+                  style={{ animationDelay: '0.2s' }}
+                ></div>
               </div>
             </div>
           </Card>

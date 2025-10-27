@@ -21,6 +21,7 @@ s3_client = boto3.client(
 
 def upload_file_to_s3(key: str, content: bytes, content_type: str = "image/jpeg") -> bool:
     """Upload binary content to S3."""
+
     try:
         s3_client.put_object(
             Bucket=AWS_BUCKET,
@@ -36,6 +37,9 @@ def upload_file_to_s3(key: str, content: bytes, content_type: str = "image/jpeg"
 
 def generate_presigned_view_url(key: str, expires_in: int = 3600) -> str | None:
     """Generate a presigned GET URL for a given S3 object key."""
+    print("🧾 AWS_ACCESS_KEY_ID:", os.getenv("AWS_ACCESS_KEY_ID"))
+    print("🧾 AWS_REGION:", os.getenv("AWS_REGION"))
+
     try:
         return s3_client.generate_presigned_url(
             "get_object",

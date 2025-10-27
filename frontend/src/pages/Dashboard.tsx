@@ -89,16 +89,17 @@ export const Dashboard: React.FC = () => {
         <div className="text-white">
           <h3 className="text-2xl font-bold mb-2">Need Help?</h3>
           <p className="text-primary-100 mb-4">
-            Check out our documentation or contact support for assistance with managing your properties
+            Check out our documentation or contact support at:+972 527991409 for assistance with managing your properties
             and maximizing your reach.
           </p>
           <div className="flex flex-wrap gap-3">
-            <Link
-              to="/"
-              className="px-4 py-2 bg-white text-primary-500 rounded-lg font-semibold hover:bg-primary-50 transition-colors"
+           <Link
+            to="/"
+            className="px-4 py-2 border border-primary-500 text-primary-500 rounded-lg font-semibold bg-transparent hover:bg-primary-50 transition-colors"
             >
-              Back to Home
+            Back to Home
             </Link>
+
           </div>
         </div>
       </Card>

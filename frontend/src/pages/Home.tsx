@@ -3,16 +3,18 @@ import { Link } from 'react-router-dom';
 import { LogIn, UserPlus, MessageCircle, Send } from 'lucide-react';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
+import houseImage from '@/assets/house2.png';
 
 export const Home: React.FC = () => {
   return (
     <div className="max-w-4xl mx-auto">
       <div className="text-center mb-12">
-        {/* Logo Placeholder */}
         <div className="flex justify-center mb-6">
-          <div className="w-32 h-32 rounded-3xl flex items-center justify-center shadow-soft bg-btn-primary">
-            <span className="text-white font-bold text-5xl">IM</span>
-          </div>
+          <img
+            src={houseImage}
+            alt="House"
+            className="h-32 w-auto object-contain"
+          />
         </div>
 
         <h1 className="text-5xl font-bold text-app-primary mb-4">
@@ -78,9 +80,13 @@ export const Home: React.FC = () => {
             </div>
           </div>
           <Link to="/chat">
-            <Button variant="outline" size="lg" className="border-white text-white hover:bg-white/20 backdrop-blur-sm">
-              Start Chat
-            </Button>
+    <Button
+  variant="secondary"
+  size="lg"
+  className="relative bg-gradient-to-r from-[#0099FF] to-[#9142FF] text-white font-semibold shadow-lg hover:shadow-xl hover:scale-105 transition-transform duration-200 rounded-xl px-6 py-3"
+>
+  Start Chat
+</Button>
           </Link>
         </div>
       </Card>

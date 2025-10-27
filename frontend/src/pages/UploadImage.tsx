@@ -60,7 +60,7 @@ export const UploadImage: React.FC = () => {
     setLoading(true);
 
     try {
-      await api.uploadPropertyImage(parseInt(selectedPropertyId), file, token!);
+      await api.uploadPropertyImage(selectedPropertyId, file, token!);
       setSuccess('Image uploaded successfully!');
       setFile(null);
       setPreview('');

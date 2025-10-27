@@ -1,5 +1,5 @@
 export interface Agent {
-  id: number;
+  id: string;
   email: string;
   full_name: string;
   phone_number: string;
@@ -8,7 +8,7 @@ export interface Agent {
 }
 
 export interface Property {
-  id: number;
+  id: string;
   address: string;
   city: string;
   price: number;

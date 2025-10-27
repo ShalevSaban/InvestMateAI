@@ -1,5 +1,4 @@
 import { Agent, Property, ChatResponse, AuthTokens, LoginCredentials, RegisterData } from '@/types';
-
 export const api = {
   // Auth
   async login(credentials: LoginCredentials): Promise<AuthTokens> {
@@ -89,7 +88,7 @@ export const api = {
     return response.json();
   },
 
-  async uploadPropertyImage(propertyId: number, file: File, token: string): Promise<{ image_url: string }> {
+  async uploadPropertyImage(propertyId: string, file: File, token: string): Promise<{ image_url: string }> {
     const formData = new FormData();
     formData.append('file', file);
 
@@ -107,7 +106,7 @@ export const api = {
     return response.json();
   },
 
-  async getPropertyImageUrl(propertyId: number): Promise<{ image_url: string }> {
+  async getPropertyImageUrl(propertyId: string): Promise<{ image_url: string }> {
     const response = await fetch(`/properties/${propertyId}/image-url`);
     if (!response.ok) {
       throw new Error('Failed to fetch image URL');
@@ -116,7 +115,7 @@ export const api = {
   },
 
   // Chat
-  async chat(question: string, agentId: number, token?: string): Promise<ChatResponse> {
+  async chat(question: string, agentId: string, token?: string): Promise<ChatResponse> {
     const headers: HeadersInit = {
       'Content-Type': 'application/json',
     };
@@ -124,31 +123,64 @@ export const api = {
       headers['Authorization'] = `Bearer ${token}`;
     }
 
+    const body = JSON.stringify({
+    question,
+    agent_id: agentId,
+    });
+
+    console.log('🌐 Sending chat request:', {
+      url: '/gpt/chat/',
+      headers,
+      body,
+    });
+
+
+
     const response = await fetch('/gpt/chat/', {
       method: 'POST',
       headers,
-      body: JSON.stringify({
-        question,
-        agent_id: agentId,
-      }),
+      body:body,
     });
 
-    if (!response.ok) {
-      throw new Error('Chat request failed');
-    }
-    return response.json();
-  },
-
-  async getChatInsights(token: string): Promise<any[]> {
-    const response = await fetch('/gpt/insights/', {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-      },
-    });
+    console.log('📩 Chat response status:', response.status);
 
     if (!response.ok) {
-      throw new Error('Failed to fetch insights');
+      const text = await response.text();
+      console.error('❌ Chat API failed. Response:', text);
+      throw new Error(`Chat request failed (${response.status})`);
     }
-    return response.json();
+
+    const json = await response.json();
+    console.log('📦 Chat response JSON:', json);
+    return json;
   },
+
+  async getChatInsights(token: string): Promise<any> {
+  console.log('🔑 Using token for insights:', token);
+
+  const response = await fetch('/api/dashboard/insights', {
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+  });
+
+  // נבדוק אם התגובה תקינה
+  const text = await response.text();
+  console.log('🧾 Raw response text:', text);
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch insights (${response.status})`);
+  }
+
+  try {
+    const json = JSON.parse(text);
+    console.log('✅ Parsed JSON:', json);
+    return json;
+  } catch (err) {
+    console.error('❌ Failed to parse JSON:', err);
+    throw new Error('Response is not valid JSON');
+  }
+},
+
 };

@@ -3,10 +3,14 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Home, LogOut, LayoutDashboard } from 'lucide-react';
 import { DarkModeToggle } from './DarkModeToggle';
 import { useAuth } from '@/context/AuthContext';
+import { useTheme } from '@/context/ThemeContext';
 import { Button } from '@/components/ui/Button';
+import logoBright from '@/assets/logo bright.png';
+import logoDark from '@/assets/logo dark.png';
 
 export const Navbar: React.FC = () => {
   const { isAuthenticated, logout } = useAuth();
+  const { isDarkMode } = useTheme();
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -18,13 +22,12 @@ export const Navbar: React.FC = () => {
     <nav className="bg-app-card shadow-soft sticky top-0 z-50 transition-all duration-300 border-b border-app">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          <Link to="/" className="flex items-center space-x-2">
-            <div className="w-10 h-10 rounded-lg flex items-center justify-center shadow-md bg-btn-primary">
-              <span className="text-white font-bold text-xl">IM</span>
-            </div>
-            <span className="text-xl font-bold text-app-primary">
-              InvestMateAI
-            </span>
+          <Link to="/" className="flex items-center">
+            <img
+              src={isDarkMode ? logoDark : logoBright}
+              alt="InvestMateAI"
+              className="h-10 w-auto object-contain"
+            />
           </Link>
 
           <div className="flex items-center space-x-4">
@@ -46,7 +49,7 @@ export const Navbar: React.FC = () => {
               </Link>
             )}
 
-            <DarkModeToggle />
+            {/* <DarkModeToggle /> */}
 
             {isAuthenticated && (
               <Button

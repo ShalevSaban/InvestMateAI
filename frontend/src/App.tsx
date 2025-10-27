@@ -26,6 +26,7 @@ function App() {
               <Route path="/add-property" element={<AddProperty />} />
               <Route path="/upload-image" element={<UploadImage />} />
               <Route path="/insights" element={<ChatInsights />} />
+
             </Routes>
           </Layout>
         </Router>

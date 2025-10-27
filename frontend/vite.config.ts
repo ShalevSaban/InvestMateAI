@@ -1,22 +1,31 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-import path from 'path'
+import { defineConfig, loadEnv } from 'vite';
+import react from '@vitejs/plugin-react';
+import path from 'path';
 
-// https://vitejs.dev/config/
-export default defineConfig({
-  plugins: [react()],
-  resolve: {
-    alias: {
-      '@': path.resolve(__dirname, './src'),
+export default defineConfig(({ mode }) => {
+  const env = loadEnv(mode, process.cwd(), '');
+  const API_URL = env.VITE_API_URL;
+
+  return {
+    plugins: [react()],
+    resolve: {
+      alias: {
+        '@': path.resolve(__dirname, './src'),
+      },
     },
-  },
-  server: {
-    port: 3000,
-    proxy: {
-      '/agents': 'http://localhost:8000',
-      '/gpt': 'http://localhost:8000',
-      '/properties': 'http://localhost:8000',
-      '/auth': 'http://localhost:8000',
-    }
-  }
-})
+    server: {
+      port: 3000,
+      proxy: {
+        '/agents': API_URL,
+        '/gpt': API_URL,
+        '/properties': API_URL,
+        '/auth': API_URL,
+        '/api': {
+          target: API_URL,
+          changeOrigin: true,
+          secure: false,
+        },
+      },
+    },
+  };
+});
