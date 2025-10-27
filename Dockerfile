@@ -1,35 +1,19 @@
-# שלב 1: בניית הפרונט
-FROM node:18 AS frontend
-WORKDIR /frontend
-COPY frontend/package*.json ./
-RUN npm ci
-COPY frontend .
-COPY frontend/.env.production
-RUN npm run build
-
-
-# שלב 2: הרצת הבאקנד
+# Dockerfile (backend)
 FROM python:3.10-slim
 
 WORKDIR /app
 
 RUN apt-get update && apt-get install -y \
-    gcc \
-    libffi-dev \
-    libpq-dev \
-    build-essential \
+    gcc libffi-dev libpq-dev build-essential \
     && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY . .
-
-# העתקת קבצי הפרונט המובנים
-COPY --from=frontend /frontend/dist ./frontend/dist
+COPY app ./app
+COPY start.sh .
 
 ENV PYTHONPATH=/app
-COPY start.sh .
 RUN chmod +x start.sh
 
 EXPOSE 8000

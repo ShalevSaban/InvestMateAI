@@ -29,7 +29,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# ✅ משרת את קבצי ה-React הבנויים
+
 app.mount("/", StaticFiles(directory="frontend/dist", html=True), name="frontend")
 
 

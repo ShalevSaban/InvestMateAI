@@ -13,6 +13,12 @@ export default defineConfig(({ mode }) => {
         '@': path.resolve(__dirname, './src'),
       },
     },
+    build: {
+      outDir: 'dist',
+      emptyOutDir: true,
+      assetsDir: 'assets',
+    },
+    base: '/',
     server: {
       port: 3000,
       proxy: {
