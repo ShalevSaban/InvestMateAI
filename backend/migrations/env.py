@@ -15,7 +15,7 @@ load_dotenv()
 
 # מייבא את Base ואת כל המודלים
 from app.database import Base
-from app.models import agent, property, conversation
+from app.models import agent, property
 
 # Alembic config object
 config = context.config

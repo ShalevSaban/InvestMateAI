@@ -11,7 +11,8 @@
       "Bash(find:*)",
       "Bash(git reset:*)",
       "Bash(git commit:*)",
-      "Bash(docker compose:*)"
+      "Bash(docker compose:*)",
+      "Bash(curl:*)"
     ],
     "deny": [],
     "ask": []

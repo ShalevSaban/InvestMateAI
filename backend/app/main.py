@@ -30,7 +30,6 @@ app.add_middleware(
 )
 
 
-app.mount("/", StaticFiles(directory="frontend/dist", html=True), name="frontend")
 
 
 @app.on_event("startup")

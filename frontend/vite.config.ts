@@ -13,12 +13,9 @@ export default defineConfig(({ mode }) => {
         '@': path.resolve(__dirname, './src'),
       },
     },
-    build: {
-      outDir: 'dist',
-      emptyOutDir: true,
-      assetsDir: 'assets',
+    css: {
+      postcss: './postcss.config.js',
     },
-    base: '/',
     server: {
       port: 3000,
       proxy: {
