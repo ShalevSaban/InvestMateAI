@@ -2,9 +2,11 @@
 FROM node:18 AS frontend
 WORKDIR /frontend
 COPY frontend/package*.json ./
-RUN npm install
+RUN npm ci
 COPY frontend .
+COPY frontend/.env.production
 RUN npm run build
+
 
 # שלב 2: הרצת הבאקנד
 FROM python:3.10-slim
