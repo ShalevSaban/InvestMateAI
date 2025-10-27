@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Home, LogOut, LayoutDashboard } from 'lucide-react';
-import { DarkModeToggle } from './DarkModeToggle';
+// import { DarkModeToggle } from './DarkModeToggle';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
 import { Button } from '@/components/ui/Button';
