@@ -1,4 +1,3 @@
-# .github/workflows/ci-cd.yml
 name: InvestMateAI CI/CD
 
 on:
