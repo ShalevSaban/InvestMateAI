@@ -13,6 +13,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@types/node": "^24.9.2",
     "@types/react": "^19.2.2",
     "@types/react-dom": "^19.2.2",
     "@vitejs/plugin-react": "^5.0.4",
@@ -30,7 +31,6 @@
     "react-router-dom": "^7.9.4"
   },
   "overrides": {
-  "rollup": "4.12.0"
-}
-
+    "rollup": "4.12.0"
+  }
 }

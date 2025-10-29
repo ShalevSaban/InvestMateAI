@@ -17,18 +17,27 @@ services:
     volumes:
       - ./backend:/app
     command: ./start.sh
+    networks:
+      - investmate-network
 
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+      args:
+        # 👇 חשוב! הכתובת של הבאקנד ברשת Docker
+        VITE_API_URL: http://investmate-backend:8000
     container_name: investmate-frontend
     ports:
       - "3000:80"
     environment:
-      - VITE_API_URL=http://localhost:8000
+      - VITE_API_URL=http://investmate-backend:8000
     depends_on:
       - backend
+    volumes:
+      - ./frontend/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    networks:
+      - investmate-network
 
   db:
     image: postgres:15
@@ -41,6 +50,8 @@ services:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+    networks:
+      - investmate-network
 
   redis:
     image: redis:7-alpine
@@ -50,7 +61,14 @@ services:
     volumes:
       - redis_data:/data
     command: redis-server --maxmemory 256mb --maxmemory-policy allkeys-lru
+    networks:
+      - investmate-network
 
 volumes:
   pgdata:
   redis_data:
+
+
+networks:
+  investmate-network:
+    driver: bridge
