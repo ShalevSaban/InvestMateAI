@@ -114,7 +114,8 @@ export const Chat: React.FC = () => {
               "- Apartment in central Tel Aviv, up to 3 rooms, yield above 2%\n" +
               "- Private house with a pool in Herzliya\n" +
               "- Penthouse in Haifa under 4 million\n" +
-                "- Apartment in Ramat Gan near the metro"
+                "- Apartment in Ramat Gan near the metro\n"+
+                "- To see all available properties, type: 'Properties'"
             }
             rows={5}
             disabled={loading}
