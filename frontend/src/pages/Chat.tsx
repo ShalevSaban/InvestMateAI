@@ -44,7 +44,7 @@ export const Chat: React.FC = () => {
 
 
   if (loadingAgents) {
-    return <Loader text="Loading agents..." />;
+    return <Loader/>;
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
