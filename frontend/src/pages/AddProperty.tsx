@@ -174,7 +174,7 @@ export const AddProperty: React.FC = () => {
                 { value: '', label: 'Select property type...' },
                 { value: 'apartment', label: 'Apartment' },
                 { value: 'house', label: 'House' },
-                { value: 'penthouse', label: 'Penthouse' },
+                { value: 'vacation', label: 'Vacation' },
               ]}
               required
             />

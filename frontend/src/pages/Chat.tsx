@@ -9,6 +9,8 @@ import { api } from '@/utils/api';
 import { Agent, Property } from '@/types';
 import { useAuth } from '@/context/AuthContext';
 import houseIcon from '@/assets/house.png';
+import {Loader} from '@/components/ui/Loader'
+
 
 interface Message {
   role: 'user' | 'assistant';
@@ -22,6 +24,7 @@ export const Chat: React.FC = () => {
   const [question, setQuestion] = useState('');
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(false);
+  const [loadingAgents, setLoadingAgents] = useState(true);
   const { token } = useAuth();
 
   useEffect(() => {
@@ -32,10 +35,17 @@ export const Chat: React.FC = () => {
         if (data.length > 0) setSelectedAgentId(data[0].id.toString());
       } catch (error) {
         console.error('Failed to fetch agents', error);
+      } finally{
+        setLoadingAgents(false);
       }
     };
     fetchAgents();
   }, []);
+
+
+  if (loadingAgents) {
+    return <Loader text="Loading agents..." />;
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -99,8 +109,14 @@ export const Chat: React.FC = () => {
           <Textarea
             value={question}
             onChange={(e) => setQuestion(e.target.value)}
-            placeholder="e.g., Show me apartments in Netanya under 2M..."
-            rows={3}
+            placeholder={
+              "Example questions:\n" +
+              "- Apartment in central Tel Aviv, up to 3 rooms, yield above 2%\n" +
+              "- Private house with a pool in Herzliya\n" +
+              "- Penthouse in Haifa under 4 million\n" +
+                "- Apartment in Ramat Gan near the metro"
+            }
+            rows={5}
             disabled={loading}
           />
           <Button

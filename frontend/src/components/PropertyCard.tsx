@@ -10,6 +10,10 @@ interface PropertyCardProps {
 
 export const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
   const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const propertyTypeLabel =
+    property.property_type && property.property_type.length > 0
+      ? property.property_type[0].toUpperCase() + property.property_type.slice(1)
+      : '';
 
   useEffect(() => {
     const fetchImage = async () => {
@@ -48,7 +52,7 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
               </div>
             </div>
             <div className="bg-primary-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
-              {property.property_type}
+              {propertyTypeLabel}
             </div>
           </div>
 

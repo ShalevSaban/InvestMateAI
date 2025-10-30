@@ -8,6 +8,8 @@ services:
     container_name: investmate-backend
     ports:
       - "8000:8000"
+    env_file:
+      - ./backend/.env
     environment:
       - DATABASE_URL=postgresql://postgres:postgres@db:5432/realestate
       - REDIS_URL=redis://redis:6379/0
@@ -16,6 +18,7 @@ services:
       - redis
     volumes:
       - ./backend:/app
+      - ./backend/.env:/app/.env:ro
     command: ./start.sh
     networks:
       - investmate-network
@@ -25,7 +28,7 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
       args:
-        # 👇 חשוב! הכתובת של הבאקנד ברשת Docker
+        # 👇 הכתובת של הבאקנד ברשת Docker
         VITE_API_URL: http://investmate-backend:8000
     container_name: investmate-frontend
     ports:
@@ -67,7 +70,6 @@ services:
 volumes:
   pgdata:
   redis_data:
-
 
 networks:
   investmate-network:

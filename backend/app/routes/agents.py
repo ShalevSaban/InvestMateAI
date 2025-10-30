@@ -75,3 +75,6 @@ def get_agents_by_name_telegram_links(agent_name: str, db: Session = Depends(get
     return {"count": len(results), "agents": results}
 
 
+@router.get("/health")
+def health_check():
+    return {"status": "ok"}

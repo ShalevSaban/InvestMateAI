@@ -10,8 +10,21 @@ import { Chat } from './pages/Chat';
 import { AddProperty } from './pages/AddProperty';
 import { UploadImage } from './pages/UploadImage';
 import { ChatInsights } from './pages/ChatInsights';
+import { useEffect } from 'react';
 
 function App() {
+    useEffect(() => {
+    const wakeBackend = async () => {
+      try {
+        await fetch('agents/health');
+        console.log('Backend is awake!');
+      } catch (err) {
+        console.error('Backend wakeup failed:', err);
+      }
+    };
+
+    wakeBackend();
+  }, []);
   return (
     <ThemeProvider>
       <AuthProvider>
