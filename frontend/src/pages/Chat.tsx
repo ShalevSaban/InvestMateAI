@@ -117,7 +117,7 @@ export const Chat: React.FC = () => {
                 "- Apartment in Ramat Gan near the metro\n"+
                 "- To see all available properties, type: 'Properties'"
             }
-            rows={5}
+            rows={6}
             disabled={loading}
           />
           <Button
