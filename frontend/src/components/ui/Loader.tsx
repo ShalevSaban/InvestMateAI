@@ -4,7 +4,7 @@ export const Loader: React.FC = () => {
   const messages = [
     "☕ Waking up the backend... it’s still stretching.",
     "💸 Shalev is trying to save hosting costs — Fly.io takes a nap when nobody’s watching.",
-    "💬 In the meantime, let me tell you about myself...",
+    "💬 In the meantime, Shalev will tell you a bit about himself...",
     "👋 Hey! I’m Shalev, a Computer Science graduate who built this system.",
     "🏗️ InvestMateAI runs on FastAPI, PostgreSQL, React, and GPT magic.",
     "🧠 Teaching the model to remember its manners...",
