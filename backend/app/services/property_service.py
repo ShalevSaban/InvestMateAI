@@ -117,7 +117,7 @@ def search_properties_by_criteria(criteria: dict, db: Session = Depends(get_db))
         query = query.filter(Property.yield_percent >= criteria["yield_percent"])
 
     # 💡 חדש: תיאור חכם עם נרדפות
-    desc_conditions = build_description_filters(criteria["description_filters"])
+    desc_conditions = build_description_filters(criteria.get("description_filters", []))
     desc_conditions = [cond for cond in desc_conditions if isinstance(cond, BinaryExpression)]
 
     print("✅ Safe description conditions:", desc_conditions)

@@ -81,7 +81,7 @@ Do not include house numbers or city names in the `address` field.
 Please follow these additional rules:
 
 - If the user provides a street name in Hebrew (e.g., "רחוב דיזנגוף"), translate it into English (e.g., "Dizengoff Street") and place it in the `address` field. Do not include directional or contextual phrases (e.g., "במרכז העיר", "צפון") in the address.
-  
+
 say that the prices in shekels - ILS - new israeli shekel
 
 If the user mentions general preferences or amenities (e.g., "with a pool", "near the metro", "city center", "north area", "south area", "near bus station", "balcony", "garden", "elevator", "parking", etc.), extract them as strings into a list under the key `description_filters`.
@@ -111,7 +111,7 @@ Output all values in English. Do not explain or include translations in the outp
 
         try:
             response = openai.ChatCompletion.create(
-                model="gpt-4-turbo",
+                model="gpt-5-mini",
                 messages=[
                     {
                         "role": "system",
@@ -119,7 +119,6 @@ Output all values in English. Do not explain or include translations in the outp
                     },
                     {"role": "user", "content": prompt},
                 ],
-                temperature=0.2,
                 timeout=10
             )
 
@@ -161,12 +160,11 @@ Output only the JSON. No explanations.
 
         try:
             response = openai.ChatCompletion.create(
-                model="gpt-4-turbo",
+                model="gpt-5-mini",
                 messages=[
                     {"role": "system", "content": "You are a dashboard assistant."},
                     {"role": "user", "content": prompt},
                 ],
-                temperature=0.4,
                 timeout=15
             )
 
@@ -224,9 +222,9 @@ Output only the JSON. No explanations.
         """
 
         response = openai.ChatCompletion.create(
-            model="gpt-4-turbo",
-            messages=[{"role": "user", "content": prompt}],
-            temperature=0.3,
+            model="gpt-5-mini",
+            messages=[{"role": "user", "content": prompt}]
+
         )
 
         content = response.choices[0].message.content.strip()
