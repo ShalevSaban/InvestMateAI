@@ -13,18 +13,25 @@ import { ChatInsights } from './pages/ChatInsights';
 import { useEffect } from 'react';
 
 function App() {
-    useEffect(() => {
-    const wakeBackend = async () => {
-      try {
-        await fetch('agents/health');
-        console.log('Backend is awake!');
-      } catch (err) {
-        console.error('Backend wakeup failed:', err);
-      }
-    };
+  useEffect(() => {
+  const wakeBackend = async () => {
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
-    wakeBackend();
-  }, []);
+    try {
+      const start = performance.now();
+      const response = await fetch(`${API_URL}/agents/health`); // ✅ עם base URL
+
+      if (response.ok) {
+        const duration = Math.round(performance.now() - start);
+        console.log(`✅ Backend awake in ${duration}ms`);
+      }
+    } catch (err) {
+      console.error('❌ Backend wake failed:', err);
+    }
+  };
+
+  wakeBackend();
+}, []);
   return (
     <ThemeProvider>
       <AuthProvider>

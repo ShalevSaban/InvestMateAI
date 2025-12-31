@@ -8,6 +8,7 @@ import { Agent, Property } from '@/types';
 import { useAuth } from '@/context/AuthContext';
 import houseIcon from '@/assets/house.png';
 import {Loader} from '@/components/ui/Loader'
+import {TelegramFallback} from '@/components/ui/TelegramFallback'
 
 
 interface Message {
@@ -32,6 +33,7 @@ export const Chat: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(false);
   const [loadingAgents, setLoadingAgents] = useState(true);
+  const [timedOut, setTimedOut] = useState(false);
   const { token } = useAuth();
 
   useEffect(() => {
@@ -46,12 +48,28 @@ export const Chat: React.FC = () => {
         setLoadingAgents(false);
       }
     };
+
+    // Set timeout for 8 seconds
+    const timeoutId = setTimeout(() => {
+      if (loadingAgents) {
+        setTimedOut(true);
+        setLoadingAgents(false);
+      }
+    }, 10000);
+
     fetchAgents();
+
+    // Cleanup timeout on unmount
+    return () => clearTimeout(timeoutId);
   }, []);
 
 
   if (loadingAgents) {
     return <Loader/>;
+  }
+
+  if (timedOut) {
+    return <TelegramFallback onRetry={() => window.location.reload()} />;
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
