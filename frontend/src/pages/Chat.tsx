@@ -53,6 +53,7 @@ export const Chat: React.FC = () => {
 
     const userMessage: Message = { role: 'user', content: question };
     // Clear previous messages and show only the new search
+    console.log('Clearing messages, setting to:', [userMessage]);
     setMessages([userMessage]);
     setLoading(true);
     setQuestion('');
@@ -64,13 +65,13 @@ export const Chat: React.FC = () => {
         content: response.message,
         properties: response.results,
       };
-      setMessages((prev) => [...prev, assistantMessage]);
+      setMessages([userMessage, assistantMessage]);
     } catch (error) {
       const errorMessage: Message = {
         role: 'assistant',
         content: 'Sorry, I encountered an error. Please try again.',
       };
-      setMessages((prev) => [...prev, errorMessage]);
+      setMessages([userMessage, errorMessage]);
     } finally {
       setLoading(false);
     }
@@ -132,7 +133,7 @@ export const Chat: React.FC = () => {
         </form>
       </Card>
 
-      <div className="space-y-6">
+      <div className="space-y-6" key={messages.length}>
         {messages.map((message, index) => (
           <div key={index}>
             <Card

@@ -106,9 +106,7 @@ def search_properties_by_criteria(criteria: dict, db: Session = Depends(get_db))
     if criteria.get("max_rooms") is not None:
         query = query.filter(Property.rooms <= criteria["max_rooms"])
     if criteria.get("property_type"):
-        ptype = criteria['property_type'].strip().lower()
-        if ptype in ['apartment', 'house', 'vacation']:
-            query = query.filter(func.lower(Property.property_type) == ptype)
+        query = query.filter(Property.property_type == criteria["property_type"].lower().strip())
     if criteria.get("min_floor") is not None:
         query = query.filter(Property.floor >= criteria["min_floor"])
     if criteria.get("max_floor") is not None:
