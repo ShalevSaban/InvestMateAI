@@ -24,7 +24,7 @@ Extract a JSON object with the following keys:
 - max_rooms (maximum rooms if mentioned)
 - min_floor (minimum floor if mentioned)
 - max_floor (maximum floor if mentioned)
-- property_type (string: "apartment", "house", etc. or null)
+- property_type (string: "apartment", "house", "vacation" or null)
 - rental_estimate_max (number or null) → for monthly rent filter
 - yield_percent (number or null)
 - description_filters (array of relevant keywords found in the user's request related to description, like: "pool", "balcony", "city center", "near metro", etc.)
@@ -61,7 +61,7 @@ A "street" can be mentioned in various natural ways, in both English and Hebrew.
 
 Handle all of the following cases (case-insensitive):
 
-#### 🏙️ English examples:
+####  English examples:
 - "Ben Yehuda street" → address = "Ben Yehuda"
 - "street Ben Yehuda" → address = "Ben Yehuda"
 - "on Ben Yehuda st." or "on st. Ben Yehuda" → address = "Ben Yehuda"
@@ -70,7 +70,7 @@ Handle all of the following cases (case-insensitive):
 - "flat at 12 Dizengoff" → address = "Dizengoff"
 - "looking for a place in Arlozorov st" → address = "Arlozorov"
 
-#### 🏠 Hebrew examples:
+####  Hebrew examples:
 - "רחוב הרצל בתל אביב" → address = "הרצל"
 - "מחפש דירה ברחוב אבן גבירול" → address = "אבן גבירול"
 - "אזור גן העיר, דיזינגוף" → address = "דיזינגוף"
@@ -84,7 +84,7 @@ Please follow these additional rules:
 
 say that the prices in shekels - ILS - new israeli shekel
 
-If the user mentions general preferences or amenities (e.g., "with a pool", "near the metro", "city center", "north area", "south area", "near bus station", "balcony", "garden", "elevator", "parking", etc.), extract them as strings into a list under the key `description_filters`.
+If the user mentions general preferences or amenities (e.g., "with a pool", "near the metro", "city center", "north area", "south area", "near bus station", "balcony", "garden", "elevator", "parking","penthouse" etc.), extract them as strings into a list under the key `description_filters`.
 
 This includes location preferences and property features such as:
 
@@ -104,6 +104,18 @@ Translate Hebrew expressions into normalized English keywords. Examples:
 - "במרכז העיר" or "Center" → "city center"
 
 If the term is ambiguous (e.g., “Center”), assume the user means “city center” unless clearly stated otherwise.
+
+"city" RULES:
+- Return city names with proper capitalization
+- Examples: "Tel Aviv", "Netanya", "Haifa", "Jerusalem", "Petah Tikva"
+
+ "property_type" RULES (CRITICAL):
+- ONLY these 3 values are allowed: "apartment", "house", "vacation" (lowercase!)
+- If user says "דירה/apartment/flat/פנטהאוז/penthouse/studio" → "apartment"
+- If user says "בית/house/villa" → "house"
+- If user says "נופש/vacation/holiday" → "vacation"
+- Default: null
+
 
 Output all values in English. Do not explain or include translations in the output — only the normalized English terms in the `description_filters` list.
 
