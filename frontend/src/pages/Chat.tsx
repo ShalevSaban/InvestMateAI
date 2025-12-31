@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { MessageCircle, Search, Sparkles } from 'lucide-react';
+import { MessageCircle, Search, Sparkles, User } from 'lucide-react';
 import { Card } from '@/components/ui/Card';
 import { Select } from '@/components/ui/Select';
 import { PropertyCard } from '@/components/PropertyCard';
@@ -258,7 +258,7 @@ export const Chat: React.FC = () => {
                   }`}
                 >
                   {message.role === 'user' ? (
-                    <span className="font-bold text-lg">U</span>
+                    <User size={20} strokeWidth={2.5} />
                   ) : (
                     <img
                       src={houseIcon}
@@ -275,8 +275,23 @@ export const Chat: React.FC = () => {
               </div>
             </Card>
 
+            {/* Search Results Summary */}
+            {message.role === 'assistant' && message.properties !== undefined && (
+              <div className="mt-4 mb-2">
+                <div className="flex items-center gap-2 px-4 py-2 bg-primary-50 dark:bg-primary-900/20 border-l-4 border-primary-500 rounded-r-lg">
+                  <Search size={18} className="text-primary-600 dark:text-primary-400" />
+                  <span className="text-sm font-medium text-primary-700 dark:text-primary-300">
+                    {message.properties.length === 0
+                      ? 'No properties found matching your search'
+                      : `Found ${message.properties.length} ${message.properties.length === 1 ? 'property' : 'properties'}`
+                    }
+                  </span>
+                </div>
+              </div>
+            )}
+
             {message.properties && message.properties.length > 0 && (
-              <div className="mt-4 space-y-4">
+              <div className="mt-2 space-y-4">
                 {message.properties.map((property) => (
                   <PropertyCard key={property.id} property={property} />
                 ))}
@@ -287,31 +302,47 @@ export const Chat: React.FC = () => {
 
         {/* Enhanced Loading State */}
         {loading && (
-          <Card
-            padding="md"
-            className="bg-white dark:bg-slate-800 max-w-2xl border-2 border-gray-200 dark:border-slate-700 shadow-lg"
-          >
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-gray-100 to-gray-200 dark:from-slate-700 dark:to-slate-800 flex items-center justify-center overflow-hidden shadow-md">
-                <img
-                  src={houseIcon}
-                  alt="AI Icon"
-                  className="w-7 h-7 object-contain"
-                />
-              </div>
-              <div className="flex space-x-2">
-                <div className="w-3 h-3 bg-gradient-to-r from-primary-500 to-purple-500 rounded-full animate-bounce shadow-lg"></div>
-                <div
-                  className="w-3 h-3 bg-gradient-to-r from-primary-500 to-purple-500 rounded-full animate-bounce shadow-lg"
-                  style={{ animationDelay: '0.15s' }}
-                ></div>
-                <div
-                  className="w-3 h-3 bg-gradient-to-r from-primary-500 to-purple-500 rounded-full animate-bounce shadow-lg"
-                  style={{ animationDelay: '0.3s' }}
-                ></div>
+          <>
+            {/* Searching Indicator */}
+            <div className="mb-4">
+              <div className="flex items-center gap-2 px-4 py-3 bg-gradient-to-r from-primary-50 to-purple-50 dark:from-primary-900/20 dark:to-purple-900/20 border-l-4 border-primary-500 rounded-r-lg shadow-md">
+                <div className="relative">
+                  <Search size={20} className="text-primary-600 dark:text-primary-400 animate-pulse" />
+                  <div className="absolute inset-0 bg-primary-500 rounded-full blur-md opacity-50 animate-ping"></div>
+                </div>
+                <span className="text-sm font-semibold text-primary-700 dark:text-primary-300 animate-pulse">
+                  Searching for properties...
+                </span>
               </div>
             </div>
-          </Card>
+
+            {/* AI Response Loading */}
+            <Card
+              padding="md"
+              className="bg-white dark:bg-slate-800 max-w-2xl border-2 border-gray-200 dark:border-slate-700 shadow-lg"
+            >
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-gray-100 to-gray-200 dark:from-slate-700 dark:to-slate-800 flex items-center justify-center overflow-hidden shadow-md">
+                  <img
+                    src={houseIcon}
+                    alt="AI Icon"
+                    className="w-7 h-7 object-contain"
+                  />
+                </div>
+                <div className="flex space-x-2">
+                  <div className="w-3 h-3 bg-gradient-to-r from-primary-500 to-purple-500 rounded-full animate-bounce shadow-lg"></div>
+                  <div
+                    className="w-3 h-3 bg-gradient-to-r from-primary-500 to-purple-500 rounded-full animate-bounce shadow-lg"
+                    style={{ animationDelay: '0.15s' }}
+                  ></div>
+                  <div
+                    className="w-3 h-3 bg-gradient-to-r from-primary-500 to-purple-500 rounded-full animate-bounce shadow-lg"
+                    style={{ animationDelay: '0.3s' }}
+                  ></div>
+                </div>
+              </div>
+            </Card>
+          </>
         )}
       </div>
     </div>
