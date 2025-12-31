@@ -37,21 +37,28 @@ export const Chat: React.FC = () => {
   const { token } = useAuth();
 
   useEffect(() => {
+    let timeoutId: NodeJS.Timeout;
+    let fetchCompleted = false;
+
     const fetchAgents = async () => {
       try {
         const data = await api.getAgents();
+        fetchCompleted = true;
+        clearTimeout(timeoutId); // Clear timeout on successful fetch
         setAgents(data);
         if (data.length > 0) setSelectedAgentId(data[0].id.toString());
       } catch (error) {
         console.error('Failed to fetch agents', error);
+        fetchCompleted = true;
+        clearTimeout(timeoutId); // Clear timeout even on error
       } finally{
         setLoadingAgents(false);
       }
     };
 
-    // Set timeout for 8 seconds
-    const timeoutId = setTimeout(() => {
-      if (loadingAgents) {
+    // Set timeout for 10 seconds
+    timeoutId = setTimeout(() => {
+      if (!fetchCompleted) {
         setTimedOut(true);
         setLoadingAgents(false);
       }
