@@ -52,7 +52,8 @@ export const Chat: React.FC = () => {
     if (!question.trim() || !selectedAgentId) return;
 
     const userMessage: Message = { role: 'user', content: question };
-    setMessages((prev) => [...prev, userMessage]);
+    // Clear previous messages and show only the new search
+    setMessages([userMessage]);
     setLoading(true);
     setQuestion('');
 
