@@ -36,47 +36,47 @@ export const Chat: React.FC = () => {
   const [timedOut, setTimedOut] = useState(false);
   const { token } = useAuth();
 
-  useEffect(() => {
+  const fetchAgents = async () => {
+    setLoadingAgents(true);
+    setTimedOut(false);
+
     let timeoutId: NodeJS.Timeout;
     let fetchCompleted = false;
 
-    const fetchAgents = async () => {
-      try {
-        const data = await api.getAgents();
-        fetchCompleted = true;
-        clearTimeout(timeoutId); // Clear timeout on successful fetch
-        setAgents(data);
-        if (data.length > 0) setSelectedAgentId(data[0].id.toString());
-      } catch (error) {
-        console.error('Failed to fetch agents', error);
-        fetchCompleted = true;
-        clearTimeout(timeoutId); // Clear timeout even on error
-      } finally{
-        setLoadingAgents(false);
-      }
-    };
-
-    // Set timeout for 10 seconds
+    // Set timeout for 8 seconds
     timeoutId = setTimeout(() => {
       if (!fetchCompleted) {
         setTimedOut(true);
         setLoadingAgents(false);
       }
-    }, 10000);
+    }, 8000);
 
+    try {
+      const data = await api.getAgents();
+      fetchCompleted = true;
+      clearTimeout(timeoutId);
+      setAgents(data);
+      if (data.length > 0) setSelectedAgentId(data[0].id.toString());
+      setLoadingAgents(false);
+    } catch (error) {
+      console.error('Failed to fetch agents', error);
+      fetchCompleted = true;
+      clearTimeout(timeoutId);
+       setTimedOut(true);
+      setLoadingAgents(false);
+    }
+  };
+
+  useEffect(() => {
     fetchAgents();
-
-    // Cleanup timeout on unmount
-    return () => clearTimeout(timeoutId);
   }, []);
-
 
   if (loadingAgents) {
     return <Loader/>;
   }
 
   if (timedOut) {
-    return <TelegramFallback onRetry={() => window.location.reload()} />;
+    return <TelegramFallback onRetry={fetchAgents} />; // העבר את הפונקציה
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
